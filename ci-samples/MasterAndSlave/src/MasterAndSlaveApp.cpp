@@ -7,6 +7,8 @@
 #include "cocMaster.h"
 #include "cocSlave.h"
 
+#define NUM_SLAVES	5
+
 using namespace ci;
 using namespace ci::app;
 using namespace std;
@@ -19,7 +21,7 @@ class MasterAndSlaveApp : public App {
 	void draw() override;
     
     coc::Master  master;
-    coc::Slave   slave;
+    coc::Slave   slaves[NUM_SLAVES];
 
     ci::params::InterfaceGlRef gui;
     int fps;
@@ -29,10 +31,17 @@ void MasterAndSlaveApp::setup()
 {
     int port = 20001;
     master.setup( io_service(), port );
-    slave.setup( io_service(), "127.0.0.1", port, 0 );
+
+	for (int i=0; i<NUM_SLAVES; i++) {
+		slaves[i].setup( io_service(), "127.0.0.1", port, i );
+	}
+
+
 
     gui = params::InterfaceGl::create( "Params", ivec2( 200, 110 ) );
     gui->addParam( "Frame rate", &fps, "", true );
+
+	setWindowSize(640,640);
 }
 
 void MasterAndSlaveApp::mouseDown( MouseEvent event )
@@ -44,7 +53,7 @@ void MasterAndSlaveApp::update()
     fps = getAverageFps();
 
 	master.update();
-	slave.update();
+	for (int i=0; i<NUM_SLAVES; i++) slaves[i].update();
 
 }
 
@@ -54,7 +63,7 @@ void MasterAndSlaveApp::draw()
     gl::color( Color( 1, 1, 1 ) );
 
 	master.drawDebug( ivec2(0,getWindowHeight()/2) );
-	slave.drawDebug( ivec2(getWindowWidth()/2,getWindowHeight()/2) );
+	for (int i=0; i<NUM_SLAVES; i++) slaves[i].drawDebug( ivec2(getWindowWidth()/2,i*120) );
 
     gui->draw();
 

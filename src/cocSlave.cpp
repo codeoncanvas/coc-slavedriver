@@ -27,10 +27,11 @@ using namespace ci::app;
 
 namespace coc{
 
-void Slave::setup( asio::io_service& ioService, std::string serverIp, int serverPort, int uid ) {
+void Slave::setup( asio::io_service& ioService, std::string serverIp, int serverPort, int _slaveId ) {
 
 	host		= serverIp;
 	port		= serverPort;
+	slaveId		= _slaveId;
 
 	client = TcpClient::create( ioService );
 
@@ -53,7 +54,7 @@ void Slave::update() {
 void Slave::drawDebug( ci::ivec2 pos )
 {
 
-	string text = "SLAVE:\n";
+	string text = "SLAVE " + toString(slaveId) + ":\n";
 	bool isConnected = false;
 	if (session) isConnected = true;
 	text += "connected? " + toString( isConnected ) + "\n\n";

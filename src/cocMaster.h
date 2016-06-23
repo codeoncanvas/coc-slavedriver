@@ -39,7 +39,7 @@ private:
 	int							receivedMax = 5;
 	std::deque<std::string> 	received;
     TcpServerRef				server;
-    TcpSessionRef				session;
+    std::vector<TcpSessionRef>	sessions;
     int32_t						port;
 
 	void						listen();

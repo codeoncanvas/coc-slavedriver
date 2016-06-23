@@ -27,7 +27,7 @@ class Slave {
     
 public:
     
-    void setup( asio::io_service& ioService, std::string serverIp, int serverPort, int uid );
+    void setup( asio::io_service& ioService, std::string serverIp, int serverPort, int _slaveId );
 	void update();
 	void drawDebug( ci::ivec2 pos );
 	void write( std::string msg );
@@ -35,6 +35,7 @@ public:
 
 private:
 
+	int							slaveId;
 	int 						receivedMax = 5;
 	std::deque<std::string> 	received;
 	TcpClientRef				client;

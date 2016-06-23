@@ -50,9 +50,10 @@ void Master::drawDebug( ci::ivec2 pos )
 {
 
     string text = "MASTER:\n";
-    bool isConnected = false;
-    if (session) isConnected = true;
-    text += "connected? " + toString( isConnected ) + "\n\n";
+    text += "numSessions = " + toString( sessions.size() ) + "\n";
+    int numConnections = 0;
+    for ( auto session : sessions) if (session) numConnections++;
+    text += "numConnections = " + toString( numConnections ) + "\n\n";
     for ( string &s : received) {
         text += s;
         text += '\n';
@@ -68,10 +69,13 @@ void Master::drawDebug( ci::ivec2 pos )
 
 void Master::write( string msg ) {
 
-    if (session && session->getSocket()->is_open()) {
-        session->write( TcpSession::stringToBuffer( msg ) );
+    for ( auto session : sessions) {
+        if (session && session->getSocket()->is_open()) {
+            session->write( TcpSession::stringToBuffer( msg ) );
 //            CI_LOG_V("Wrote: " << msg );
+        }
     }
+
 
 }
 
@@ -80,7 +84,7 @@ void Master::listen()
     if ( server ) {
 
         server->accept( (uint16_t)port );
-        CI_LOG_I( "Listening on port: " + toString( port ) );
+        CI_LOG_I( "Listening on port " << toString( port ) <<"with max connections " << (int) server->getAcceptor()->max_connections );
     }
 }
 
@@ -91,7 +95,8 @@ void Master::onAccept( TcpSessionRef _session )
 
     // Get the session from the argument and set callbacks.
     // Note that you can use lambdas.
-    session = _session;
+    sessions.push_back(_session);
+    auto session = sessions.back();
     session->connectCloseEventHandler( [ & ]() {
         CI_LOG_I(  "Session closed" );
     } );
@@ -102,6 +107,7 @@ void Master::onAccept( TcpSessionRef _session )
 
     // Start reading data from the client.
     session->read();
+
 }
 
 void Master::onCancel()
@@ -137,7 +143,7 @@ void Master::onRead( BufferRef buffer )
     received.push_back( response );
     while (received.size() > receivedMax) received.pop_front();
 
-    session->read();
+    for ( auto session : sessions) session->read();
 }
 
 void Master::onReadComplete()
@@ -148,8 +154,6 @@ void Master::onReadComplete()
 void Master::onWrite( size_t bytesTransferred )
 {
 //        CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
-
-    session->read();
 }
     
 }//namespace coc

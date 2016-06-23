@@ -23,8 +23,34 @@
 
 namespace coc{
 
-class cocMaster {
+class Master {
+    
+public:
+    
+    void setup(  asio::io_service& ioService, int serverPort );
+	void update();
+	void drawDebug( ci::ivec2 pos );
+	void write( std::string msg );
 
+
+    
+private:
+
+	int							receivedMax = 5;
+	std::deque<std::string> 	received;
+    TcpServerRef				server;
+    TcpSessionRef				session;
+    int32_t						port;
+
+	void						listen();
+    void						onAccept( TcpSessionRef _session );
+    void						onCancel();
+    void						onClose();
+    void						onError( std::string err, size_t bytesTransferred );
+    void						onRead( ci::BufferRef buffer );
+    void						onReadComplete();
+    void						onWrite( size_t bytesTransferred );
+    
 };//class Master
 
 }// namespace coc

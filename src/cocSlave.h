@@ -23,8 +23,31 @@
 
 namespace coc {
 
-class cocSlave {
+class Slave {
+    
+public:
+    
+    void setup( asio::io_service& ioService, std::string serverIp, int serverPort, int uid );
+	void update();
+	void drawDebug( ci::ivec2 pos );
+	void write( std::string msg );
 
-};//class cocSlave
+
+private:
+
+	int 						receivedMax = 5;
+	std::deque<std::string> 	received;
+	TcpClientRef				client;
+	TcpSessionRef				session;
+	std::string					host;
+	int32_t						port;
+
+	void						onConnect( TcpSessionRef _session );
+	void						onError( std::string err, size_t bytesTransferred );
+	void						onRead( ci::BufferRef buffer );
+	void						onWrite( size_t bytesTransferred );
+
+    
+};//class Slave
 
 }//namespace coc

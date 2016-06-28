@@ -42,6 +42,7 @@ public:
 
 private:
 
+	void connect();
 	void processKeyValuePair(char _key, std::string _value);
 	void write( std::string msg );
 	void reply();
@@ -49,6 +50,8 @@ private:
 	int 						lastFrameReceived = -1;
 	float 						lastDeltaReceived = -1;
 	bool 						hasFrameChanged = false;
+	float						lastConnectionAttempt;
+	float 						connectionAttemptInterval = 5.0f;
 	std::string					msg = "";
 	int							slaveId = -1;
 	int 						receivedMax = 5;

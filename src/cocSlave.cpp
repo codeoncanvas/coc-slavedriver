@@ -42,15 +42,29 @@ void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int
 		CI_LOG_I( "Endpoint resolved" );
 	} );
 
-	CI_LOG_I( "Connecting to: " + host + ":" + toString( port ) );
-	client->connect( host, (uint16_t)port );
-
+	lastConnectionAttempt = -connectionAttemptInterval;
 }
 
-void Slave::update() {
-	reply();
 
-	session->read();
+void Slave::connect()
+{
+	CI_LOG_I( "Connecting to: " + host + ":" + toString( port ) );
+	client->connect( host, (uint16_t)port );
+}
+
+
+void Slave::update() {
+
+	if (!session && getElapsedSeconds() - lastConnectionAttempt > connectionAttemptInterval) {
+		connect();
+		lastConnectionAttempt = getElapsedSeconds();
+	}
+	else if (session) {
+
+		reply();
+
+		session->read();
+	}
 
 }
 
@@ -137,7 +151,7 @@ void Slave::onConnect( TcpSessionRef _session )
 	session = _session;
 	session->connectCloseEventHandler( [ & ]()
 	{
-		CI_LOG_I( "Disconnected" );
+		CI_LOG_E( "Disconnected" );
 	} );
 	session->connectErrorEventHandler( &Slave::onError, this );
 	session->connectReadCompleteEventHandler( [ & ]()
@@ -186,7 +200,7 @@ void Slave::onRead( ci::BufferRef buffer )
 
 void Slave::onWrite( size_t bytesTransferred )
 {
-	CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
+//	CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
 }
 
 }//namespace coc

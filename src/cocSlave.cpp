@@ -86,7 +86,13 @@ void Slave::processKeyValuePair( char _key, std::string _value )
 {
 	switch (_key) {
 		case 'F':
-			lastFrameReceived = fromString<int>(_value);
+		{
+			int newFrame = fromString<int>(_value);
+			if (newFrame != lastFrameReceived) {
+				hasFrameChanged = true;
+				lastFrameReceived = newFrame;
+			}
+		}
 			break;
 		case 'T':
 			lastDeltaReceived = fromString<float>(_value);
@@ -96,6 +102,14 @@ void Slave::processKeyValuePair( char _key, std::string _value )
 			break;
 	}
 }
+
+bool Slave::getHasFrameChanged()
+{
+	bool b = hasFrameChanged;
+	hasFrameChanged = false;
+	return b;
+}
+
 
 void Slave::reply()
 {
@@ -112,7 +126,7 @@ void Slave::reply()
 void Slave::write( std::string msg ) {
 	if (session && session->getSocket()->is_open()) {
 		session->write( TcpSession::stringToBuffer( msg ) );
-		CI_LOG_V("Wrote: << msg");
+//		CI_LOG_V("Wrote: << msg");
 	}
 }
 
@@ -128,7 +142,7 @@ void Slave::onConnect( TcpSessionRef _session )
 	session->connectErrorEventHandler( &Slave::onError, this );
 	session->connectReadCompleteEventHandler( [ & ]()
 	{
-		CI_LOG_I( "Read complete" );
+//		CI_LOG_I( "Read complete" );
 	} );
 	session->connectReadEventHandler( &Slave::onRead, this );
 	session->connectWriteEventHandler( &Slave::onWrite, this );

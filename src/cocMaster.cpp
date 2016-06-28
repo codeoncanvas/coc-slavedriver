@@ -148,7 +148,7 @@ void Master::onError( string err, size_t bytesTransferred )
 
 void Master::onRead( BufferRef buffer )
 {
-    CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
+//    CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
     string incoming	= TcpSession::bufferToString( buffer );
     if (incoming.length()) received.push_back( incoming );
@@ -159,7 +159,7 @@ void Master::onRead( BufferRef buffer )
 
 void Master::onReadComplete()
 {
-    CI_LOG_I( "Read complete" );
+//    CI_LOG_I( "Read complete" );
 }
 
 void Master::onWrite( size_t bytesTransferred )

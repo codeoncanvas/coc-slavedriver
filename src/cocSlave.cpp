@@ -27,13 +27,13 @@ using namespace ci::app;
 
 namespace coc{
 
-void Slave::setup( asio::io_service& ioService, std::string serverIp, int serverPort, int _slaveId ) {
+void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int _id ) {
 
-	host		= serverIp;
-	port		= serverPort;
-	slaveId		= _slaveId;
+	host		= _ip;
+	port		= _port;
+	slaveId		= _id;
 
-	client = TcpClient::create( ioService );
+	client = TcpClient::create( _ioService );
 
 	client->connectConnectEventHandler( &Slave::onConnect, this );
 	client->connectErrorEventHandler( &Slave::onError, this );
@@ -48,7 +48,10 @@ void Slave::setup( asio::io_service& ioService, std::string serverIp, int server
 }
 
 void Slave::update() {
-	//
+	reply();
+
+	session->read();
+
 }
 
 void Slave::drawDebug( ci::ivec2 pos )
@@ -69,6 +72,42 @@ void Slave::drawDebug( ci::ivec2 pos )
 	gl::ScopedColor col( Color(1,1,1) );
 	gl::draw(tex, pos);
 }
+
+
+void Slave::addKeyValuePair( char _key, std::string _value )
+{
+	msg += _key;
+	msg += '=';
+	msg += _value;
+	msg += ',';
+}
+
+void Slave::processKeyValuePair( char _key, std::string _value )
+{
+	switch (_key) {
+		case 'F':
+			lastFrameReceived = fromString<int>(_value);
+			break;
+		case 'T':
+			lastDeltaReceived = fromString<float>(_value);
+			break;
+		default:
+			CI_LOG_E("Unknown key!");
+			break;
+	}
+}
+
+void Slave::reply()
+{
+	//not required if TCP:
+//	addKeyValuePair('S', toString(slaveId) );
+//	addKeyValuePair('F', toString(lastFrameReceived) );
+
+	if (msg.length()) write(msg);
+	msg = "";
+
+}
+
 
 void Slave::write( std::string msg ) {
 	if (session && session->getSocket()->is_open()) {
@@ -111,11 +150,23 @@ void Slave::onRead( ci::BufferRef buffer )
 {
 //	CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
-	string response	= TcpSession::bufferToString( buffer );
-	received.push_back( response );
+	string incoming	= TcpSession::bufferToString( buffer );
+	if (incoming.length()) received.push_back( incoming );
 	while (received.size() > receivedMax) received.pop_front();
 
-	session->read();
+	vector<string>	pairs = split( incoming, ',', true );
+
+	for ( string &s : pairs ) {
+		vector<string> pair = split(s,'=');
+		if (pair.size()==2) {
+			processKeyValuePair( pair[0][0], pair[1] );
+		}
+		else {
+//			CI_LOG_E("Pair incomplete!");
+		}
+
+	}
+
 
 }
 

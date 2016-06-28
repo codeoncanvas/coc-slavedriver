@@ -26,16 +26,28 @@ namespace coc {
 class Slave {
     
 public:
-    
-    void setup( asio::io_service& ioService, std::string serverIp, int serverPort, int _slaveId );
+
+	//! Connect to master
+    void setup( asio::io_service& _ioService, std::string _ip, int _port, int _id );
+	//! Process received messages?
 	void update();
+	//! Draw debug text to screen
 	void drawDebug( ci::ivec2 pos );
-	void write( std::string msg );
+
+	//! Optionally add pairs to frame message
+	void addKeyValuePair( char _key, std::string _value);
 
 
 private:
 
-	int							slaveId;
+	void processKeyValuePair(char _key, std::string _value);
+	void write( std::string msg );
+	void reply();
+
+	int 						lastFrameReceived = -1;
+	float 						lastDeltaReceived = -1;
+	std::string					msg = "";
+	int							slaveId = -1;
 	int 						receivedMax = 5;
 	std::deque<std::string> 	received;
 	TcpClientRef				client;

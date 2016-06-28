@@ -28,21 +28,37 @@ using namespace std;
 
 namespace coc{
     
-void Master::setup( asio::io_service& ioService, int serverPort )
+void Master::setup( asio::io_service& _ioService, int _port )
 {
-    port = serverPort;
+    port = _port;
 
-    server = TcpServer::create( ioService );
+    server = TcpServer::create( _ioService );
 
     server->connectAcceptEventHandler( &Master::onAccept, this );
     server->connectCancelEventHandler( &Master::onCancel, this );
     server->connectErrorEventHandler( &Master::onError, this );
 
-    listen();
+    accept();
 }
 
-void Master::update() {
-    write( toString( getElapsedFrames() ) );
+
+void Master::addKeyValuePair( char _key, std::string _value )
+{
+    msg += _key;
+    msg += '=';
+    msg += _value;
+    msg += ',';
+}
+
+void Master::update( float _delta )
+{
+
+    addKeyValuePair('F', toString(getElapsedFrames()) );
+    addKeyValuePair('T', toString(_delta) );
+    writeToAll( msg );
+    msg = "";
+
+    for ( auto session : sessions) session->read();
 }
 
 
@@ -51,9 +67,9 @@ void Master::drawDebug( ci::ivec2 pos )
 
     string text = "MASTER:\n";
     text += "numSessions = " + toString( sessions.size() ) + "\n";
-    int numConnections = 0;
-    for ( auto session : sessions) if (session) numConnections++;
-    text += "numConnections = " + toString( numConnections ) + "\n\n";
+    int numSessionsConnected = 0;
+    for ( auto session : sessions) if (session) numSessionsConnected++;
+    text += "numSessionsConnected = " + toString( numSessionsConnected ) + "\n\n";
     for ( string &s : received) {
         text += s;
         text += '\n';
@@ -67,7 +83,7 @@ void Master::drawDebug( ci::ivec2 pos )
 }
 
 
-void Master::write( string msg ) {
+void Master::writeToAll( string msg ) {
 
     for ( auto session : sessions) {
         if (session && session->getSocket()->is_open()) {
@@ -79,7 +95,7 @@ void Master::write( string msg ) {
 
 }
 
-void Master::listen()
+void Master::accept()
 {
     if ( server ) {
 
@@ -93,8 +109,6 @@ void Master::onAccept( TcpSessionRef _session )
 {
     CI_LOG_I( "Connected" );
 
-    // Get the session from the argument and set callbacks.
-    // Note that you can use lambdas.
     sessions.push_back(_session);
     auto session = sessions.back();
     session->connectCloseEventHandler( [ & ]() {
@@ -105,8 +119,7 @@ void Master::onAccept( TcpSessionRef _session )
     session->connectReadEventHandler( &Master::onRead, this );
     session->connectWriteEventHandler( &Master::onWrite, this );
 
-    // Start reading data from the client.
-    session->read();
+//    session->read();
 
 }
 
@@ -114,16 +127,14 @@ void Master::onCancel()
 {
     CI_LOG_I( "Canceled" );
 
-    // Automatically listen on cancel.
-    listen();
+    accept();
 }
 
 void Master::onClose()
 {
     CI_LOG_I( "Disconnected" );
 
-    // Automatically listen on close.
-    listen();
+    accept();
 }
 
 void Master::onError( string err, size_t bytesTransferred )
@@ -139,11 +150,11 @@ void Master::onRead( BufferRef buffer )
 {
     CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
-    string response	= TcpSession::bufferToString( buffer );
-    received.push_back( response );
+    string incoming	= TcpSession::bufferToString( buffer );
+    if (incoming.length()) received.push_back( incoming );
     while (received.size() > receivedMax) received.pop_front();
 
-    for ( auto session : sessions) session->read();
+//    for ( auto session : sessions) session->read();
 }
 
 void Master::onReadComplete()

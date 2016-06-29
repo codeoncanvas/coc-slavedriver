@@ -7,7 +7,10 @@
 #include "cocMaster.h"
 #include "cocSlave.h"
 
-#define NUM_SLAVES	5
+#define NUM_SLAVES			5
+#define CONNECT_INTERVAL	2.0f
+#define PORT				20001
+int nextSlaveToConnect = 0;
 
 using namespace ci;
 using namespace ci::app;
@@ -29,14 +32,11 @@ class MasterAndSlaveApp : public App {
 
 void MasterAndSlaveApp::setup()
 {
-    int port = 20001;
-    master.setup( io_service(), port );
+    master.setup( io_service(), PORT );
 
 	for (int i=0; i<NUM_SLAVES; i++) {
-		slaves[i].setup( io_service(), "127.0.0.1", port, i );
+		slaves[i].setup( io_service(), "127.0.0.1", PORT, i );
 	}
-
-
 
     gui = params::InterfaceGl::create( "Params", ivec2( 200, 110 ) );
     gui->addParam( "Frame rate", &fps, "", true );
@@ -46,10 +46,12 @@ void MasterAndSlaveApp::setup()
 
 void MasterAndSlaveApp::mouseDown( MouseEvent event )
 {
+	
 }
 
 void MasterAndSlaveApp::update()
 {
+
     fps = getAverageFps();
 
 	master.update();

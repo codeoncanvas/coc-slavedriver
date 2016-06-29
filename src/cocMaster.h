@@ -20,30 +20,38 @@
 #pragma once
 
 #include "TcpServer.h"
-#include "cinder/gl/gl.h"
 
 namespace coc{
 
 class Master {
     
 public:
-    
-    void setup(  asio::io_service& ioService, int serverPort );
-	void update();
-	void drawDebug( ci::ivec2 pos );
-	void write( std::string msg );
 
+	//! Start listening for client connections
+    void setup(  asio::io_service& _ioService, int _port );
+
+	//! Optionally add pairs to frame message
+	void addKeyValuePair( char _key, std::string _value);
+
+	//! Call to send message
+	void update( float _delta );
+
+	//! Draw debug text to screen
+	void drawDebug( ci::ivec2 pos );
 
     
 private:
 
+	void writeToAll( std::string _msg );
+
+	std::string					msg = "";
 	int							receivedMax = 5;
 	std::deque<std::string> 	received;
     TcpServerRef				server;
     std::vector<TcpSessionRef>	sessions;
     int32_t						port;
 
-	void						listen();
+	void						accept();
     void						onAccept( TcpSessionRef _session );
     void						onCancel();
     void						onClose();

@@ -82,7 +82,7 @@ void Slave::drawDebug( ci::ivec2 pos )
 	bool isConnected = false;
 	if (session) isConnected = true;
 	text += "connected? " + toString( isConnected ) + "\n\n";
-	for ( string &s : received) {
+	for ( string &s : receivedStrings) {
 		text += s;
 		text += '\n';
 	}
@@ -119,7 +119,7 @@ void Slave::processKeyValuePair( char _key, std::string _value )
 			lastDeltaReceived = fromString<float>(_value);
 			break;
 		default:
-			CI_LOG_E("Unknown key!");
+			receivedMessages.push_back( MessageForSlave( _key, _value ) );
 			break;
 	}
 }
@@ -129,6 +129,14 @@ bool Slave::getHasFrameChanged()
 	bool b = hasFrameChanged;
 	hasFrameChanged = false;
 	return b;
+}
+
+
+MessageForSlave Slave::getNextMessage()
+{
+	MessageForSlave m = receivedMessages.front();
+	receivedMessages.pop_front();
+	return m;
 }
 
 
@@ -186,8 +194,8 @@ void Slave::onRead( ci::BufferRef buffer )
 //	CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
 	string incoming	= TcpSession::bufferToString( buffer );
-	if (incoming.length()) received.push_back( incoming );
-	while (received.size() > receivedMax) received.pop_front();
+	if (incoming.length()) receivedStrings.push_back( incoming );
+	while (receivedStrings.size() > receivedStringMax) receivedStrings.pop_front();
 
 	vector<string>	pairs = split( incoming, ',', true );
 

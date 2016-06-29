@@ -23,6 +23,16 @@
 
 namespace coc {
 
+class MessageForSlave {
+public:
+	MessageForSlave( char key, std::string value ) :
+	key(key),
+	value(value)
+	{}
+	char key;
+	std::string value;
+};
+
 class Slave {
     
 public:
@@ -42,6 +52,12 @@ public:
 	//! Check if we need to update/render
 	bool getHasFrameChanged();
 
+	//! Check if we need to process messages
+	bool hasWaitingMessages() { return receivedMessages.size(); };
+
+	//! Get next message form queue
+	MessageForSlave	getNextMessage();
+
 	//! Get last time delta received
 	float getTimeDelta();
 
@@ -60,8 +76,9 @@ private:
 	float 						connectionAttemptInterval = 5.0f;
 	std::string					msg = "";
 	int							slaveId = -1;
-	int 						receivedMax = 5;
-	std::deque<std::string> 	received;
+	int 						receivedStringMax = 5;
+	std::deque<std::string> 	receivedStrings;
+	std::deque<MessageForSlave> receivedMessages;
 	TcpClientRef				client;
 	TcpSessionRef				session;
 	std::string					host;

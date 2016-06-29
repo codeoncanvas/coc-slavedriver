@@ -20,6 +20,7 @@
 #pragma once
 
 #include "TcpClient.h"
+#include "cinder/gl/gl.h"
 
 namespace coc {
 

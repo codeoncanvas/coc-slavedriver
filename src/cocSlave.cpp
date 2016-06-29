@@ -19,6 +19,7 @@
 
 #include "cinder/Log.h"
 #include "cinder/Utilities.h"
+#include "cinder/app/App.h"
 #include "cocSlave.h"
 
 using namespace ci;

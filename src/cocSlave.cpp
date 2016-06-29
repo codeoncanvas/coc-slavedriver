@@ -68,6 +68,13 @@ void Slave::update() {
 
 }
 
+
+float Slave::getTimeDelta()
+{
+	return lastDeltaReceived;
+}
+
+
 void Slave::drawDebug( ci::ivec2 pos )
 {
 

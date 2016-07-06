@@ -8,9 +8,7 @@
 #include "cocSlave.h"
 
 #define NUM_SLAVES			5
-#define CONNECT_INTERVAL	2.0f
 #define PORT				20001
-int nextSlaveToConnect = 0;
 
 using namespace ci;
 using namespace ci::app;
@@ -28,6 +26,9 @@ class MasterAndSlaveApp : public App {
 
     ci::params::InterfaceGlRef gui;
     int fps;
+
+	float lastTime;
+	float delta;
 };
 
 void MasterAndSlaveApp::setup()
@@ -42,6 +43,8 @@ void MasterAndSlaveApp::setup()
     gui->addParam( "Frame rate", &fps, "", true );
 
 	setWindowSize(640,640);
+
+	lastTime = getElapsedSeconds();
 }
 
 void MasterAndSlaveApp::mouseDown( MouseEvent event )
@@ -54,7 +57,12 @@ void MasterAndSlaveApp::update()
 
     fps = getAverageFps();
 
-	master.update();
+
+	delta = getElapsedSeconds() - lastTime;
+	master.update(delta);
+	lastTime = getElapsedSeconds();
+
+
 	for (int i=0; i<NUM_SLAVES; i++) slaves[i].update();
 
 }

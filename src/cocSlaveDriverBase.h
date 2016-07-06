@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "cinder/app/App.h"
+
 namespace coc {
 
 class SlaveDriverMessage {

@@ -47,6 +47,7 @@ private:
     TcpServerRef				server;
     std::vector<TcpSessionRef>	sessions;
     int32_t						port;
+	bool 						disableNagle = true;
 
 	void						accept();
     void						onAccept( TcpSessionRef _session );

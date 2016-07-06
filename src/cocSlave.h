@@ -60,6 +60,7 @@ private:
 	TcpSessionRef				session;
 	std::string					host;
 	int32_t						port;
+	bool 						disableNagle = true;
 
 	void						onConnect( TcpSessionRef _session );
 	void						onError( std::string err, size_t bytesTransferred );

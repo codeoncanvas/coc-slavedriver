@@ -111,6 +111,12 @@ void Master::onAccept( TcpSessionRef _session )
 
     sessions.push_back(_session);
     auto session = sessions.back();
+
+    if (disableNagle) {
+        asio::ip::tcp::no_delay option(true);
+        session->getSocket()->set_option(option);
+    }
+
     session->connectCloseEventHandler( [ & ]() {
         CI_LOG_I(  "Session closed" );
     } );

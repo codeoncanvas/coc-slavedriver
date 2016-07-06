@@ -149,6 +149,12 @@ void Slave::onConnect( TcpSessionRef _session )
 	CI_LOG_I( "Connected" );
 
 	session = _session;
+
+	if (disableNagle) {
+		asio::ip::tcp::no_delay option(true);
+		session->getSocket()->set_option(option);
+	}
+
 	session->connectCloseEventHandler( [ & ]()
 	{
 		CI_LOG_E( "Disconnected" );

@@ -42,15 +42,31 @@ void Master::setup( asio::io_service& _ioService, int _port )
     accept();
 }
 
+
+bool Master::allRepliesReceived()
+{
+    if (getElapsedSeconds() < 3) return true;
+    return numReplies == sessions.size();
+}
+
+
 void Master::update( float _delta )
 {
-    lastFrameSent = getElapsedFrames();
-    addKeyValuePair('F', toString(lastFrameSent) );
-    addKeyValuePair('T', toString(_delta) );
-    writeToAll( msg );
-    msg = "";
+    if ( allRepliesReceived()) {
+        lastFrameSent = getElapsedFrames();
+        addKeyValuePair('F', toString(lastFrameSent) );
+        addKeyValuePair('T', toString(_delta) );
+        writeToAll( msg );
+        msg = "";
 
-    for ( auto session : sessions) session->read();
+        for ( auto session : sessions) session->read();
+
+        numReplies = 0;
+    }
+    else {
+        CI_LOG_E("Not all replies in time, only " << numReplies << " of " << sessions.size() );
+    }
+
 }
 
 
@@ -87,6 +103,21 @@ void Master::writeToAll( string msg ) {
 
 }
 
+void Master::processKeyValuePair( char _key, std::string _value )
+{
+    switch (_key) {
+        case 'F':
+            numReplies++;
+            break;
+        case 'S':
+            //
+            break;
+        default:
+            receivedMessages.push_back( SlaveDriverMessage( _key, _value ) );
+            break;
+    }
+}
+
 void Master::accept()
 {
     if ( server ) {
@@ -113,9 +144,9 @@ void Master::onAccept( TcpSessionRef _session )
         CI_LOG_I(  "Session closed" );
     } );
     session->connectErrorEventHandler( &Master::onError, this );
-    session->connectReadCompleteEventHandler( &Master::onReadComplete, this );
+//    session->connectReadCompleteEventHandler( &Master::onReadComplete, this );
     session->connectReadEventHandler( &Master::onRead, this );
-    session->connectWriteEventHandler( &Master::onWrite, this );
+//    session->connectWriteEventHandler( &Master::onWrite, this );
 
 //    session->read();
 
@@ -149,10 +180,9 @@ void Master::onRead( BufferRef buffer )
 //    CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
     string incoming	= TcpSession::bufferToString( buffer );
-    if (incoming.length()) receivedStrings.push_back( incoming );
-    while (receivedStrings.size() > receivedStringMax) receivedStrings.pop_front();
 
-//    for ( auto session : sessions) session->read();
+    processBuffer( incoming );
+
 }
 
 void Master::onReadComplete()

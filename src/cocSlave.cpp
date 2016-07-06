@@ -62,7 +62,7 @@ void Slave::update() {
 	}
 	else if (session) {
 
-		reply();
+//		reply();
 
 		session->read();
 	}
@@ -127,9 +127,8 @@ bool Slave::getHasFrameChanged()
 
 void Slave::reply()
 {
-	//not required if TCP:
-//	addKeyValuePair('S', toString(slaveId) );
-//	addKeyValuePair('F', toString(lastFrameReceived) );
+	addKeyValuePair('S', toString(slaveId) );
+	addKeyValuePair('F', toString(lastFrameReceived) );
 
 	if (msg.length()) write(msg);
 	msg = "";
@@ -160,15 +159,14 @@ void Slave::onConnect( TcpSessionRef _session )
 		CI_LOG_E( "Disconnected" );
 	} );
 	session->connectErrorEventHandler( &Slave::onError, this );
-	session->connectReadCompleteEventHandler( [ & ]()
-	{
-//		CI_LOG_I( "Read complete" );
-	} );
 	session->connectReadEventHandler( &Slave::onRead, this );
-	session->connectWriteEventHandler( &Slave::onWrite, this );
-
 	session->read();
 
+//	session->connectWriteEventHandler( &Slave::onWrite, this );
+	//	session->connectReadCompleteEventHandler( [ & ]()
+//	{
+//		CI_LOG_I( "Read complete" );
+//	} );
 }
 
 void Slave::onError( string err, size_t bytesTransferred )
@@ -188,8 +186,7 @@ void Slave::onRead( ci::BufferRef buffer )
 
 	processBuffer(incoming);
 
-	write( "F=" + toString(lastFrameReceived) );
-
+	reply();
 
 }
 

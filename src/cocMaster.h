@@ -42,11 +42,14 @@ public:
     
 private:
 
+	void processKeyValuePair( char _key, std::string _value ) override;
 	void writeToAll( std::string _msg );
+	bool allRepliesReceived();
 
     TcpServerRef				server;
     std::vector<TcpSessionRef>	sessions;
 	int32_t						lastFrameSent = -1;
+	int 						numReplies = 0;
 
 	void						accept();
     void						onAccept( TcpSessionRef _session );

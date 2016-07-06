@@ -20,6 +20,7 @@
 #include "cinder/Log.h"
 #include "cinder/Utilities.h"
 #include "cinder/Text.h"
+#include "cinder/app/App.h"
 #include "cocMaster.h"
 
 using namespace ci;

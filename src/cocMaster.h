@@ -20,6 +20,8 @@
 #pragma once
 
 #include "TcpServer.h"
+#include "cinder/gl/gl.h"
+
 
 namespace coc{
 
@@ -29,10 +31,13 @@ public:
 
 	//! Start listening for client connections
     void setup(  asio::io_service& _ioService, int _port );
+
 	//! Optionally add pairs to frame message
 	void addKeyValuePair( char _key, std::string _value);
+
 	//! Call to send message
 	void update( float _delta );
+
 	//! Draw debug text to screen
 	void drawDebug( ci::ivec2 pos );
 

@@ -21,38 +21,32 @@
 
 #include "TcpServer.h"
 #include "cinder/gl/gl.h"
+#include "cocSlaveDriverBase.h"
 
 
 namespace coc{
 
-class Master {
+class Master : public SlaveDriverBase {
     
 public:
 
 	//! Start listening for client connections
     void setup(  asio::io_service& _ioService, int _port );
 
-	//! Optionally add pairs to frame message
-	void addKeyValuePair( char _key, std::string _value);
-
 	//! Call to send message
 	void update( float _delta );
 
 	//! Draw debug text to screen
-	void drawDebug( ci::ivec2 pos );
+	void drawDebug( ci::ivec2 pos ) override;
 
     
 private:
 
 	void writeToAll( std::string _msg );
 
-	std::string					msg = "";
-	int							receivedMax = 5;
-	std::deque<std::string> 	received;
     TcpServerRef				server;
     std::vector<TcpSessionRef>	sessions;
-    int32_t						port;
-	bool 						disableNagle = true;
+	int32_t						lastFrameSent = -1;
 
 	void						accept();
     void						onAccept( TcpSessionRef _session );

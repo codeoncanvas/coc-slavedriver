@@ -21,20 +21,11 @@
 
 #include "TcpClient.h"
 #include "cinder/gl/gl.h"
+#include "cocSlaveDriverBase.h"
 
 namespace coc {
 
-class MessageForSlave {
-public:
-	MessageForSlave( char key, std::string value ) :
-	key(key),
-	value(value)
-	{}
-	char key;
-	std::string value;
-};
-
-class Slave {
+class Slave : public SlaveDriverBase {
     
 public:
 
@@ -45,19 +36,10 @@ public:
 	void update();
 
 	//! Draw debug text to screen
-	void drawDebug( ci::ivec2 pos );
-
-	//! Optionally add pairs to frame message
-	void addKeyValuePair( char _key, std::string _value);
+	void drawDebug( ci::ivec2 pos ) override;
 
 	//! Check if we need to update/render
 	bool getHasFrameChanged();
-
-	//! Check if we need to process messages
-	bool hasWaitingMessages() { return receivedMessages.size(); };
-
-	//! Get next message form queue
-	MessageForSlave	getNextMessage();
 
 	//! Get last time delta received
 	float getTimeDelta();
@@ -66,7 +48,7 @@ public:
 private:
 
 	void connect();
-	void processKeyValuePair(char _key, std::string _value);
+	void processKeyValuePair(char _key, std::string _value) override;
 	void write( std::string msg );
 	void reply();
 
@@ -75,16 +57,11 @@ private:
 	bool 						hasFrameChanged = false;
 	float						lastConnectionAttempt;
 	float 						connectionAttemptInterval = 5.0f;
-	std::string					msg = "";
 	int							slaveId = -1;
-	int 						receivedStringMax = 5;
-	std::deque<std::string> 	receivedStrings;
-	std::deque<MessageForSlave> receivedMessages;
 	TcpClientRef				client;
 	TcpSessionRef				session;
 	std::string					host;
-	int32_t						port;
-	bool 						disableNagle = true;
+
 
 	void						onConnect( TcpSessionRef _session );
 	void						onError( std::string err, size_t bytesTransferred );

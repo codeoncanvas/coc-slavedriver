@@ -42,19 +42,10 @@ void Master::setup( asio::io_service& _ioService, int _port )
     accept();
 }
 
-
-void Master::addKeyValuePair( char _key, std::string _value )
-{
-    msg += _key;
-    msg += '=';
-    msg += _value;
-    msg += ',';
-}
-
 void Master::update( float _delta )
 {
-
-    addKeyValuePair('F', toString(getElapsedFrames()) );
+    lastFrameSent = getElapsedFrames();
+    addKeyValuePair('F', toString(lastFrameSent) );
     addKeyValuePair('T', toString(_delta) );
     writeToAll( msg );
     msg = "";
@@ -71,7 +62,7 @@ void Master::drawDebug( ci::ivec2 pos )
     int numSessionsConnected = 0;
     for ( auto session : sessions) if (session) numSessionsConnected++;
     text += "numSessionsConnected = " + toString( numSessionsConnected ) + "\n\n";
-    for ( string &s : received) {
+    for ( string &s : receivedStrings) {
         text += s;
         text += '\n';
     }
@@ -158,8 +149,8 @@ void Master::onRead( BufferRef buffer )
 //    CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
     string incoming	= TcpSession::bufferToString( buffer );
-    if (incoming.length()) received.push_back( incoming );
-    while (received.size() > receivedMax) received.pop_front();
+    if (incoming.length()) receivedStrings.push_back( incoming );
+    while (receivedStrings.size() > receivedStringMax) receivedStrings.pop_front();
 
 //    for ( auto session : sessions) session->read();
 }

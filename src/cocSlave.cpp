@@ -96,14 +96,6 @@ void Slave::drawDebug( ci::ivec2 pos )
 }
 
 
-void Slave::addKeyValuePair( char _key, std::string _value )
-{
-	msg += _key;
-	msg += '=';
-	msg += _value;
-	msg += ',';
-}
-
 void Slave::processKeyValuePair( char _key, std::string _value )
 {
 	switch (_key) {
@@ -120,7 +112,7 @@ void Slave::processKeyValuePair( char _key, std::string _value )
 			lastDeltaReceived = fromString<float>(_value);
 			break;
 		default:
-			receivedMessages.push_back( MessageForSlave( _key, _value ) );
+			receivedMessages.push_back( SlaveDriverMessage( _key, _value ) );
 			break;
 	}
 }
@@ -130,14 +122,6 @@ bool Slave::getHasFrameChanged()
 	bool b = hasFrameChanged;
 	hasFrameChanged = false;
 	return b;
-}
-
-
-MessageForSlave Slave::getNextMessage()
-{
-	MessageForSlave m = receivedMessages.front();
-	receivedMessages.pop_front();
-	return m;
 }
 
 
@@ -201,21 +185,10 @@ void Slave::onRead( ci::BufferRef buffer )
 //	CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
 	string incoming	= TcpSession::bufferToString( buffer );
-	if (incoming.length()) receivedStrings.push_back( incoming );
-	while (receivedStrings.size() > receivedStringMax) receivedStrings.pop_front();
 
-	vector<string>	pairs = split( incoming, ',', true );
+	processBuffer(incoming);
 
-	for ( string &s : pairs ) {
-		vector<string> pair = split(s,'=');
-		if (pair.size()==2) {
-			processKeyValuePair( pair[0][0], pair[1] );
-		}
-		else {
-//			CI_LOG_E("Pair incomplete!");
-		}
-
-	}
+	write( "F=" + toString(lastFrameReceived) );
 
 
 }

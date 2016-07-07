@@ -47,7 +47,7 @@ public:
 	//! Add pair with double value
 	void addPair( char key, double value );
 
-	//! Turn pairs into buffer
+	//! Turn buffer into pairs
 	void processBuffer( ci::Buffer buffer );
 
 	//! Get map of types for keys

@@ -10,7 +10,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E3F76C14-5F88-4988-BC27-A864E3CE45FF}</ProjectGuid>
+    <ProjectGuid>{A3D84E54-0AE9-42A4-B2D8-E3098ABD9BB5}</ProjectGuid>
     <RootNamespace>MasterAndSlave</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
@@ -45,7 +45,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;"..\..\..\..\..\_cinder\Cinder.git\include";..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src;..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;"..\..\..\..\..\include";..\..\..\..\Cinder-Asio_banthrewind\src;..\..\..\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -55,11 +55,11 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>"..\..\..\..\..\_cinder\Cinder.git\include";..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"..\..\..\..\..\include";..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>cinder-$(PlatformToolset)_d.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>"..\..\..\..\..\_cinder\Cinder.git\lib\msw\$(PlatformTarget)"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"..\..\..\..\..\lib\msw\$(PlatformTarget)"</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -69,7 +69,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\include;"..\..\..\..\..\_cinder\Cinder.git\include";..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src;..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;"..\..\..\..\..\include";..\..\..\..\Cinder-Asio_banthrewind\src;..\..\..\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -81,11 +81,11 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>"..\..\..\..\..\_cinder\Cinder.git\include";..\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"..\..\..\..\..\include";..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>cinder-$(PlatformToolset).lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>"..\..\..\..\..\_cinder\Cinder.git\lib\msw\$(PlatformTarget)"</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"..\..\..\..\..\lib\msw\$(PlatformTarget)"</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
@@ -102,47 +102,49 @@
   <ItemGroup />
   <ItemGroup>
     <ClCompile Include="..\src\MasterAndSlaveApp.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ClientInterface.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\DispatcherInterface.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ServerInterface.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\SessionInterface.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpClient.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpServer.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpSession.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpClient.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpServer.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpSession.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\WaitTimer.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocMaster.cpp" />
-    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocSlave.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\ClientInterface.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\DispatcherInterface.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\ServerInterface.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\SessionInterface.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpClient.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpServer.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpSession.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpClient.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpServer.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpSession.cpp" />
+    <ClCompile Include="..\..\..\..\Cinder-Asio_banthrewind\src\WaitTimer.cpp" />
+    <ClCompile Include="..\..\..\src\cocMaster.cpp" />
+    <ClCompile Include="..\..\..\src\cocSlave.cpp" />
+    <ClCompile Include="..\..\..\src\cocSlaveDriverBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Resources.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\CinderAsio.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ClientEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ClientInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\DispatcherEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\DispatcherInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ServerEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ServerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\SessionEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\SessionInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpClient.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpClientEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpServer.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpServerEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpSession.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpSessionEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpClient.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpClientEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpServer.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpServerEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpSession.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpSessionEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\WaitTimer.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\WaitTimerEventHandlerInterface.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocMaster.h" />
-    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocSlave.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\CinderAsio.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\ClientEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\ClientInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\DispatcherEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\DispatcherInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\ServerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\ServerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\SessionEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\SessionInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpClient.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpClientEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpServer.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpServerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpSession.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\TcpSessionEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpClient.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpClientEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpServer.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpServerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpSession.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\UdpSessionEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\WaitTimer.h" />
+    <ClInclude Include="..\..\..\..\Cinder-Asio_banthrewind\src\WaitTimerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\src\cocMaster.h" />
+    <ClInclude Include="..\..\..\src\cocSlave.h" />
+    <ClInclude Include="..\..\..\src\cocSlaveDriverBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

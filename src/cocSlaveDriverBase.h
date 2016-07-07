@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "cinder/app/App.h"
 #include "cocKeyValByteManager.h"
 
 namespace coc {

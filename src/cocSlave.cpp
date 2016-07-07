@@ -127,8 +127,8 @@ bool Slave::getHasFrameChanged()
 
 void Slave::reply()
 {
-	addKeyValuePair('F', toString(lastFrameReceived) );
 	addKeyValuePair('S', toString(slaveId) );
+	addKeyValuePair('F', toString(lastFrameReceived) );
 
 	if (msg.length()) write(msg);
 	msg = "";

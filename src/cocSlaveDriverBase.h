@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "cocKeyValByteManager.h"
+
 namespace coc {
 
 class SlaveDriverMessage {
@@ -54,6 +56,8 @@ public:
 	virtual void drawDebug( ci::ivec2 pos ) {};
 
 protected:
+
+	coc::KeyValByteManager			bytesIn, byteOut;
 
 	std::string						msg = "";
 	int 							receivedStringMax = 5;

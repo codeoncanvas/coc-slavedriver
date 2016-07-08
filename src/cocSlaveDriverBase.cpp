@@ -32,7 +32,7 @@ void SlaveDriverBase::setup() {
 	bytesInTcp.getMap()['T'] = coc::KV_DOUBLE;
 	bytesInTcp.getMap()['S'] = coc::KV_DOUBLE;
 
-	bytesOutTcp = bytesInTcp;
+	bytesOutTcp = bytesOutUdp = bytesInUdp = bytesInTcp;
 }
 
 

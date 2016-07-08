@@ -29,19 +29,47 @@ using namespace std;
 
 namespace coc{
     
-void Master::setup( asio::io_service& _ioService, int _port )
+void Master::setup( asio::io_service& _ioService, std::string _ip, int _port )
 {
     SlaveDriverBase::setup();
 
     port = _port;
 
-    server = TcpServer::create( _ioService );
+    // TCP
 
-    server->connectAcceptEventHandler( &Master::onAccept, this );
-    server->connectCancelEventHandler( &Master::onCancel, this );
-    server->connectErrorEventHandler( &Master::onError, this );
+    serverTcp = TcpServer::create( _ioService );
+
+    serverTcp->connectAcceptEventHandler( &Master::onAccept, this );
+    serverTcp->connectCancelEventHandler( &Master::onCancel, this );
+    serverTcp->connectErrorEventHandler( &Master::onError, this );
 
     accept();
+
+    // UDP
+
+    clientUdp = UdpClient::create( _ioService );
+
+    clientUdp->connectConnectEventHandler( &Master::onConnect, this );
+    clientUdp->connectErrorEventHandler( &Master::onError, this );
+//    clientUdp->connectResolveEventHandler( [ & ]()
+//    {
+//        console()<< "Endpoint resolved"<<endl;
+//    } );
+
+    clientUdp->connect( _ip, port);
+}
+
+void Master::onConnect( UdpSessionRef session )
+{
+    sessionUdp = session;
+    sessionUdp->connectErrorEventHandler( &Master::onError, this );
+//    sessionUdp->connectWriteEventHandler( &Master::onWrite, this );
+
+    sessionUdp->getSocket()->set_option(asio::socket_base::broadcast(true));
+
+//    sessionUdp->connectReadCompleteEventHandler( &Master::onReadComplete, this );
+//    sessionUdp->connectReadEventHandler( &Master::onRead, this );
+
 }
 
 
@@ -56,6 +84,8 @@ void Master::update( float _delta )
 {
     lastFrameSent = getElapsedFrames();
 
+    // TCP
+
     bytesOutTcp.addPair('F', (uint32_t)lastFrameSent );
     bytesOutTcp.addPair('T', (double)_delta );
 
@@ -64,6 +94,20 @@ void Master::update( float _delta )
     bytesOutTcp.clear();
 
     for ( auto session : sessions) session->read();
+
+
+    // UDP
+
+    bytesOutUdp.addPair('F', (uint32_t)lastFrameSent );
+    bytesOutUdp.addPair('T', (double)_delta );
+
+    if ( sessionUdp && sessionUdp->getSocket()->is_open() ) {
+        sessionUdp->write( bytesOutUdp.getBuffer() );
+    }
+
+    bytesOutUdp.clear();
+
+
 
 //    if ( allRepliesReceived()) {
 //          //process
@@ -110,10 +154,10 @@ void Master::writeToAll( BufferRef _buf ) {
 
 void Master::accept()
 {
-    if ( server ) {
+    if ( serverTcp ) {
 
-        server->accept( (uint16_t)port );
-        CI_LOG_I( "Listening on port " << toString( port ) <<"with max connections " << (int) server->getAcceptor()->max_connections );
+        serverTcp->accept( (uint16_t)port );
+        CI_LOG_I( "Listening on port " << toString( port ) <<"with max connections " << (int) serverTcp->getAcceptor()->max_connections );
     }
 }
 

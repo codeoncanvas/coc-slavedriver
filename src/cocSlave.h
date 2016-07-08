@@ -45,7 +45,7 @@ public:
 	float getTimeDelta();
 
 
-//private:
+private:
 
 	void connect();
 	void write( ci::BufferRef _buf );
@@ -61,6 +61,10 @@ public:
 	TcpSessionRef				session;
 	std::string					host;
 
+	UdpClientRef    			clientUdp;
+	UdpSessionRef   			sessionUdp;
+	void						onConnectUdp( UdpSessionRef _session );
+	void						onReadUdp( ci::BufferRef buffer );
 
 	void						onConnect( TcpSessionRef _session );
 	void						onError( std::string err, size_t bytesTransferred );

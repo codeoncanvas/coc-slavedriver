@@ -21,6 +21,8 @@
 
 #include "cinder/app/App.h"
 #include "cocKeyValByteManager.h"
+#include "UdpClient.h"
+#include "UdpSession.h"
 
 namespace coc {
 
@@ -35,6 +37,7 @@ public:
 protected:
 
 	coc::KeyValByteManager			bytesInTcp, bytesOutTcp;
+	coc::KeyValByteManager			bytesInUdp, bytesOutUdp;
 
 	bool 							disableNagle = false;
 	int32_t							port;

@@ -31,7 +31,7 @@ class Master : public SlaveDriverBase {
 public:
 
 	//! Start listening for client connections
-    void setup(  asio::io_service& _ioService, int _port );
+    void setup(  asio::io_service& _ioService, std::string _ip, int _port );
 
 	//! Call to send message
 	void update( float _delta );
@@ -40,15 +40,21 @@ public:
 	void drawDebug( ci::ivec2 pos ) override;
 
     
-//private:
+private:
 
 	void writeToAll( ci::BufferRef _buf );
 	bool allRepliesReceived();
 
-    TcpServerRef				server;
-    std::vector<TcpSessionRef>	sessions;
+    TcpServerRef				serverTcp;
+	std::vector<TcpSessionRef>	sessions;
+
+	UdpClientRef    			clientUdp;
+	UdpSessionRef   			sessionUdp;
+
 	int32_t						lastFrameSent = -1;
 	int 						numReplies = 0;
+
+	void 						onConnect( UdpSessionRef session );
 
 	void						accept();
     void						onAccept( TcpSessionRef _session );

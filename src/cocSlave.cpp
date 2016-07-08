@@ -36,6 +36,8 @@ void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int
 	port		= _port;
 	slaveId		= _id;
 
+	// TCP
+
 	client = TcpClient::create( _ioService );
 
 	client->connectConnectEventHandler( &Slave::onConnect, this );
@@ -46,6 +48,33 @@ void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int
 	} );
 
 	lastConnectionAttempt = -connectionAttemptInterval;
+
+	// UDP
+
+	clientUdp = UdpClient::create( _ioService );
+
+	clientUdp->connectConnectEventHandler( &Slave::onConnectUdp, this );
+	clientUdp->connectErrorEventHandler( &Slave::onError, this );
+//    clientUdp->connectResolveEventHandler( [ & ]()
+//    {
+//        console()<< "Endpoint resolved"<<endl;
+//    } );
+
+	clientUdp->connect( "127.0.0.1", port);
+
+}
+
+
+void Slave::onConnectUdp( UdpSessionRef session )
+{
+	sessionUdp = session;
+	sessionUdp->connectErrorEventHandler( &Slave::onError, this );
+//    sessionUdp->connectWriteEventHandler( &Master::onWrite, this );
+//    sessionUdp->connectReadCompleteEventHandler( &Master::onReadComplete, this );
+
+    sessionUdp->connectReadEventHandler( &Slave::onReadUdp, this );
+
+	sessionUdp->read();
 }
 
 
@@ -152,6 +181,40 @@ void Slave::onError( string err, size_t bytesTransferred )
 		text += ": " + err;
 	}
 	CI_LOG_E( text );
+}
+
+void Slave::onReadUdp( ci::BufferRef buffer )
+{
+	CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
+
+//	bytesInUdp.processBuffer( buffer );
+//
+//	for ( KeyValByteBase * kv : bytesInUdp.getPairs() ) {
+//
+//		switch (kv->getKey()) {
+//			case 'F':
+//			{
+//				coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
+//				uint32_t newFrame = tmp->getValue();
+//				if (newFrame != lastFrameReceived) {
+//					hasFrameChanged = true;
+//					lastFrameReceived = newFrame;
+//				}
+//			}
+//				break;
+//			case 'T':
+//			{
+//				coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
+//				lastDeltaReceived = tmp->getValue();
+//			}
+//				break;
+//		}
+//
+//	}
+//
+//	bytesInUdp.clear();
+
+	sessionUdp->read();
 }
 
 void Slave::onRead( ci::BufferRef buffer )

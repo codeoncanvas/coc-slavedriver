@@ -2,12 +2,11 @@
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/params/Params.h"
-#include "cinder/Text.h"
 
 #include "cocMaster.h"
 #include "cocSlave.h"
 
-#define NUM_SLAVES			5
+#define NUM_SLAVES			1
 #define PORT				20001
 
 using namespace ci;
@@ -33,7 +32,7 @@ class MasterAndSlaveApp : public App {
 
 void MasterAndSlaveApp::setup()
 {
-    master.setup( io_service(), PORT );
+    master.setup( io_service(), "127.0.0.255", PORT );
 
 	for (int i=0; i<NUM_SLAVES; i++) {
 		slaves[i].setup( io_service(), "127.0.0.1", PORT, i );

@@ -40,10 +40,9 @@ public:
 	void drawDebug( ci::ivec2 pos ) override;
 
     
-private:
+//private:
 
-	void processKeyValuePair( char _key, std::string _value ) override;
-	void writeToAll( std::string _msg );
+	void writeToAll( ci::BufferRef _buf );
 	bool allRepliesReceived();
 
     TcpServerRef				server;

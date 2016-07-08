@@ -24,47 +24,19 @@
 
 namespace coc {
 
-class SlaveDriverMessage {
-public:
-	SlaveDriverMessage( char key, std::string value ) :
-			key(key),
-			value(value)
-	{}
-	char key;
-	std::string value;
-};//class SlaveDriverMessage
-
-
 class SlaveDriverBase {
 
 public:
 
-	//! Optionally add pairs to frame message
-	void addKeyValuePair( char _key, std::string _value);
-
-	//! Check if we need to process messages
-	bool hasWaitingMessages() { return receivedMessages.size(); };
-
-	//! Get next message form queue
-	SlaveDriverMessage	getNextMessage();
-
-	//! Turn buffer into array of messages
-	void processBuffer( std::string _incoming );
-
-	//! Process message
-	virtual void processKeyValuePair( char _key, std::string _value ) {};
+	void setup();
 
 	virtual void drawDebug( ci::ivec2 pos ) {};
 
 protected:
 
-	coc::KeyValByteManager			bytesIn, byteOut;
+	coc::KeyValByteManager			bytesInTcp, bytesOutTcp;
 
-	std::string						msg = "";
-	int 							receivedStringMax = 5;
-	std::deque<std::string> 		receivedStrings;
-	std::deque<SlaveDriverMessage> 	receivedMessages;
-	bool 							disableNagle = true;
+	bool 							disableNagle = false;
 	int32_t							port;
 
 

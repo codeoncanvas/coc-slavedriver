@@ -41,21 +41,21 @@ vector<KeyValByteBase *> & KeyValByteManager::getPairs()
 	return kvPairs;
 }
 
-ci::Buffer KeyValByteManager::getBuffer()
+ci::BufferRef KeyValByteManager::getBuffer()
 {
-	ci::Buffer buf( byteArray.size() );
-	memcpy( buf.getData(), &byteArray[0], byteArray.size() );
+	ci::BufferRef buf = ci::Buffer::create( byteArray.size() );
+	memcpy( buf->getData(), &byteArray[0], byteArray.size() );
 	return buf;
 }
 
-void KeyValByteManager::processBuffer( ci::Buffer buffer )
+void KeyValByteManager::processBuffer( ci::BufferRef buffer )
 {
 	UInt8 result[4];
 	Byte dArray[sizeof( double )] = { 0 };
 
 	size_t i = 0, j = 0;
-	size_t numElements = buffer.getSize() / sizeof( uint8_t );
-	Byte *pBuffer = reinterpret_cast<Byte *>( buffer.getData() );
+	size_t numElements = buffer->getSize() / sizeof( uint8_t );
+	Byte *pBuffer = reinterpret_cast<Byte *>( buffer->getData() );
 
 	for ( i = 0; i < numElements; i ++ ) {
 		Byte element = pBuffer[i];

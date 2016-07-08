@@ -30,6 +30,8 @@ namespace coc{
 
 void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int _id ) {
 
+	SlaveDriverBase::setup();
+
 	host		= _ip;
 	port		= _port;
 	slaveId		= _id;
@@ -62,8 +64,6 @@ void Slave::update() {
 	}
 	else if (session) {
 
-//		reply();
-
 		session->read();
 	}
 
@@ -82,39 +82,15 @@ void Slave::drawDebug( ci::ivec2 pos )
 	string text = "SLAVE " + toString(slaveId) + ":\n";
 	bool isConnected = false;
 	if (session) isConnected = true;
-	text += "connected? " + toString( isConnected ) + "\n\n";
-	for ( string &s : receivedStrings) {
-		text += s;
-		text += '\n';
-	}
+	text += "connected? " + toString( isConnected ) + "\n";
+	text += "lastFrame= " + toString( lastFrameReceived ) + "\n";
+	text += "lastDelta= " + toString( lastDeltaReceived ) + "\n";
 
 	TextBox textbox;
 	textbox.setText(text);
 	gl::TextureRef tex = gl::Texture::create( textbox.render() );
 	gl::ScopedColor col( Color(1,1,1) );
 	gl::draw(tex, pos);
-}
-
-
-void Slave::processKeyValuePair( char _key, std::string _value )
-{
-	switch (_key) {
-		case 'F':
-		{
-			int newFrame = fromString<int>(_value);
-			if (newFrame != lastFrameReceived) {
-				hasFrameChanged = true;
-				lastFrameReceived = newFrame;
-			}
-		}
-			break;
-		case 'T':
-			lastDeltaReceived = fromString<float>(_value);
-			break;
-		default:
-			receivedMessages.push_back( SlaveDriverMessage( _key, _value ) );
-			break;
-	}
 }
 
 bool Slave::getHasFrameChanged()
@@ -127,19 +103,19 @@ bool Slave::getHasFrameChanged()
 
 void Slave::reply()
 {
-	addKeyValuePair('S', toString(slaveId) );
-	addKeyValuePair('F', toString(lastFrameReceived) );
 
-	if (msg.length()) write(msg);
-	msg = "";
+	bytesOutTcp.addPair('S',(uint32_t)slaveId);
+	bytesOutTcp.addPair('F',(double)lastFrameReceived);
+	write(bytesOutTcp.getBuffer());
+	bytesOutTcp.clear();
 
 }
 
 
-void Slave::write( std::string msg ) {
+void Slave::write( BufferRef _buf ) {
 	if (session && session->getSocket()->is_open()) {
-		session->write( TcpSession::stringToBuffer( msg ) );
-//		CI_LOG_V("Wrote: << msg");
+		session->write( _buf );
+//		CI_LOG_V("Wrote buffer");
 	}
 }
 
@@ -182,12 +158,34 @@ void Slave::onRead( ci::BufferRef buffer )
 {
 //	CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
-	string incoming	= TcpSession::bufferToString( buffer );
+	bytesInTcp.processBuffer( buffer );
 
-	processBuffer(incoming);
+	for ( KeyValByteBase * kv : bytesInTcp.getPairs() ) {
+
+		switch (kv->getKey()) {
+			case 'F':
+			{
+				coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
+				uint32_t newFrame = tmp->getValue();
+				if (newFrame != lastFrameReceived) {
+					hasFrameChanged = true;
+					lastFrameReceived = newFrame;
+				}
+			}
+				break;
+			case 'T':
+			{
+				coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
+				lastDeltaReceived = tmp->getValue();
+			}
+				break;
+		}
+
+	}
+
+	bytesInTcp.clear();
 
 	reply();
-
 }
 
 void Slave::onWrite( size_t bytesTransferred )

@@ -26,43 +26,14 @@ using namespace std;
 
 namespace coc {
 
+void SlaveDriverBase::setup() {
 
-void SlaveDriverBase::processBuffer( std::string _incoming )
-{
-	if (_incoming.length()) receivedStrings.push_back( _incoming );
-	while (receivedStrings.size() > receivedStringMax) receivedStrings.pop_front();
+	bytesInTcp.getMap()['F'] = coc::KV_INT32;
+	bytesInTcp.getMap()['T'] = coc::KV_DOUBLE;
+	bytesInTcp.getMap()['S'] = coc::KV_DOUBLE;
 
-	vector<string>	pairs = split( _incoming, ',', true );
-
-
-	for ( string &s : pairs ) {
-		vector<string> pair = split(s,'=');
-		if (pair.size()==2) {
-			processKeyValuePair( pair[0][0], pair[1] );
-		}
-		else {
-//			CI_LOG_E("Pair incomplete!");
-		}
-
-	}
+	bytesOutTcp = bytesInTcp;
 }
-
-
-SlaveDriverMessage SlaveDriverBase::getNextMessage()
-{
-	SlaveDriverMessage m = receivedMessages.front();
-	receivedMessages.pop_front();
-	return m;
-}
-
-void SlaveDriverBase::addKeyValuePair( char _key, std::string _value )
-{
-	msg += _key;
-	msg += '=';
-	msg += _value;
-	msg += ',';
-}
-
 
 
 }//namespace coc

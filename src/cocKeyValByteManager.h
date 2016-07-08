@@ -48,7 +48,7 @@ public:
 	void addPair( char key, double value );
 
 	//! Turn buffer into pairs
-	void processBuffer( ci::Buffer buffer );
+	void processBuffer( ci::BufferRef buffer );
 
 	//! Get map of types for keys
 	std::map< char, KeyValByteType > & getMap();
@@ -57,7 +57,7 @@ public:
 	std::vector<KeyValByteBase *> & getPairs();
 
 	//! Return pairs as buffer
-	ci::Buffer getBuffer();
+	ci::BufferRef getBuffer();
 
 	//! Clear byte array and pairs
 	void clear();

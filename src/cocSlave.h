@@ -45,18 +45,17 @@ public:
 	float getTimeDelta();
 
 
-private:
+//private:
 
 	void connect();
-	void processKeyValuePair(char _key, std::string _value) override;
-	void write( std::string msg );
+	void write( ci::BufferRef _buf );
 	void reply();
 
-	int 						lastFrameReceived = -1;
-	float 						lastDeltaReceived = -1;
+	uint32_t 					lastFrameReceived = -1;
+	double 						lastDeltaReceived = -1;
 	bool 						hasFrameChanged = false;
-	float						lastConnectionAttempt;
-	float 						connectionAttemptInterval = 5.0f;
+	double						lastConnectionAttempt;
+	double 						connectionAttemptInterval = 5.0f;
 	int							slaveId = -1;
 	TcpClientRef				client;
 	TcpSessionRef				session;

@@ -31,6 +31,8 @@ namespace coc{
     
 void Master::setup( asio::io_service& _ioService, int _port )
 {
+    SlaveDriverBase::setup();
+
     port = _port;
 
     server = TcpServer::create( _ioService );
@@ -52,20 +54,25 @@ bool Master::allRepliesReceived()
 
 void Master::update( float _delta )
 {
-    if ( allRepliesReceived()) {
-        lastFrameSent = getElapsedFrames();
-        addKeyValuePair('F', toString(lastFrameSent) );
-        addKeyValuePair('T', toString(_delta) );
-        writeToAll( msg );
-        msg = "";
+    lastFrameSent = getElapsedFrames();
 
-        for ( auto session : sessions) session->read();
+    bytesOutTcp.addPair('F', (uint32_t)lastFrameSent );
+    bytesOutTcp.addPair('T', (double)_delta );
 
-        numReplies = 0;
-    }
-    else {
-        CI_LOG_E("Not all replies in time, only " << numReplies << " of " << sessions.size() );
-    }
+    writeToAll( bytesOutTcp.getBuffer() );
+
+    bytesOutTcp.clear();
+
+    for ( auto session : sessions) session->read();
+
+//    if ( allRepliesReceived()) {
+//          //process
+//
+//        numReplies = 0;
+//    }
+//    else {
+//        CI_LOG_E("Not all replies in time, only " << numReplies << " of " << sessions.size() );
+//    }
 
 }
 
@@ -78,10 +85,7 @@ void Master::drawDebug( ci::ivec2 pos )
     int numSessionsConnected = 0;
     for ( auto session : sessions) if (session) numSessionsConnected++;
     text += "numSessionsConnected = " + toString( numSessionsConnected ) + "\n\n";
-    for ( string &s : receivedStrings) {
-        text += s;
-        text += '\n';
-    }
+
 
     TextBox textbox;
     textbox.setText(text);
@@ -91,32 +95,18 @@ void Master::drawDebug( ci::ivec2 pos )
 }
 
 
-void Master::writeToAll( string msg ) {
+void Master::writeToAll( BufferRef _buf ) {
 
     for ( auto session : sessions) {
         if (session && session->getSocket()->is_open()) {
-            session->write( TcpSession::stringToBuffer( msg ) );
-//            CI_LOG_V("Wrote: " << msg );
+            session->write( _buf );
+//            CI_LOG_V("Wrote buffer");
         }
     }
 
 
 }
 
-void Master::processKeyValuePair( char _key, std::string _value )
-{
-    switch (_key) {
-        case 'F':
-            numReplies++;
-            break;
-        case 'S':
-            //
-            break;
-        default:
-            receivedMessages.push_back( SlaveDriverMessage( _key, _value ) );
-            break;
-    }
-}
 
 void Master::accept()
 {
@@ -179,9 +169,24 @@ void Master::onRead( BufferRef buffer )
 {
 //    CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
 
-    string incoming	= TcpSession::bufferToString( buffer );
+    bytesInTcp.processBuffer(buffer);
 
-    processBuffer( incoming );
+//    for ( KeyValByteBase * kv : bytesInTcp.getPairs() ) {
+//
+//        switch (kv->getKey()) {
+//            case 'F':
+//            {
+//                coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
+//            }
+//                break;
+//            case 'T':
+//            {
+//                coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
+//            }
+//                break;
+//        }
+//
+//    }
 
 }
 
@@ -192,7 +197,7 @@ void Master::onReadComplete()
 
 void Master::onWrite( size_t bytesTransferred )
 {
-//        CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
+        CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
 }
     
 }//namespace coc

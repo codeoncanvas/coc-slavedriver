@@ -2,6 +2,11 @@
 
 //! \brief Class to help manage key value pairs as buffer of bytes for sending over network.
 
+#ifdef CINDER_MSW
+#include "cinder/app/App.h"
+typedef uint8_t Byte;
+#endif
+
 namespace coc {
 
 //-------------------------------------------------------

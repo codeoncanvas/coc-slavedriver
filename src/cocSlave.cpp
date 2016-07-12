@@ -28,11 +28,11 @@ using namespace ci::app;
 
 namespace coc{
 
-void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int _id ) {
+void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::string _multicastIp, int _port, int _id ) {
 
 	SlaveDriverBase::setup();
 
-	host		= _ip;
+	host		= _serverIp;
 	port		= _port;
 	slaveId		= _id;
 
@@ -51,37 +51,40 @@ void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int
 
 	// UDP
 
-	clientUdp = UdpClient::create( _ioService );
+	udpEndpoint = asio::ip::udp::endpoint( asio::ip::address::from_string("0.0.0.0"), (short) port);
+	udpSocket = new asio::ip::udp::socket( _ioService );
+	udpSocket->open(udpEndpoint.protocol());
+	udpSocket->set_option(asio::ip::udp::socket::reuse_address(true));
+	udpSocket->bind(udpEndpoint);
 
-	clientUdp->connectConnectEventHandler( &Slave::onConnectUdp, this );
-	clientUdp->connectErrorEventHandler( &Slave::onError, this );
-    clientUdp->connectResolveEventHandler( [ & ]()
-    {
-        console()<< "Slave UDP endpoint resolved"<<endl;
-    } );
+	// Join the multicast group.
+	udpSocket->set_option(
+			asio::ip::multicast::join_group(asio::ip::address::from_string(_multicastIp)));
 
-	clientUdp->connect( "0.0.0.0", port);
+	udpSocket->async_receive_from(
+			asio::buffer(udpData, udpMax), udpEndpoint,
+			bind(&Slave::udpHandleReceive, this,
+					std::placeholders::_1,//error
+					std::placeholders::_2));//bytes_transferred
 
 }
 
 
-void Slave::onConnectUdp( UdpSessionRef session )
+void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd )
 {
-	console()<< "UDP connected"<<endl;
+	if (error) {
+		CI_LOG_E("UDP error");
+	}
+	else {
+		std::cout.write(udpData, bytes_recvd);
+		std::cout << std::endl;
 
-	sessionUdp = session;
-	sessionUdp->connectErrorEventHandler( &Slave::onError, this );
-//    sessionUdp->connectWriteEventHandler( &Master::onWrite, this );
-//    sessionUdp->connectReadCompleteEventHandler( &Master::onReadComplete, this );
-
-    sessionUdp->connectReadEventHandler( &Slave::onReadUdp, this );
-
-	sessionUdp->getSocket()->set_option(asio::ip::udp::socket::reuse_address(true));
-	sessionUdp->getSocket()->set_option(asio::socket_base::broadcast(true));
-
-	sessionUdp->read();
-
-
+		udpSocket->async_receive_from(
+				asio::buffer(udpData, udpMax), udpEndpoint,
+				bind(&Slave::udpHandleReceive, this,
+						std::placeholders::_1,//error
+						std::placeholders::_2));//bytes_transferred
+	}
 }
 
 
@@ -190,39 +193,6 @@ void Slave::onError( string err, size_t bytesTransferred )
 	CI_LOG_E( text );
 }
 
-void Slave::onReadUdp( ci::BufferRef buffer )
-{
-	CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
-
-//	bytesInUdp.processBuffer( buffer );
-//
-//	for ( KeyValByteBase * kv : bytesInUdp.getPairs() ) {
-//
-//		switch (kv->getKey()) {
-//			case 'F':
-//			{
-//				coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
-//				uint32_t newFrame = tmp->getValue();
-//				if (newFrame != lastFrameReceived) {
-//					hasFrameChanged = true;
-//					lastFrameReceived = newFrame;
-//				}
-//			}
-//				break;
-//			case 'T':
-//			{
-//				coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
-//				lastDeltaReceived = tmp->getValue();
-//			}
-//				break;
-//		}
-//
-//	}
-//
-//	bytesInUdp.clear();
-
-	sessionUdp->read();
-}
 
 void Slave::onRead( ci::BufferRef buffer )
 {

@@ -8,6 +8,7 @@
 
 #define NUM_SLAVES			1
 #define PORT				20001
+#define MULTICAST_IP		"239.255.0.1"
 
 using namespace ci;
 using namespace ci::app;
@@ -32,10 +33,10 @@ class MasterAndSlaveApp : public App {
 
 void MasterAndSlaveApp::setup()
 {
-    master.setup( io_service(), "192.168.1.255", PORT );
+    master.setup( io_service(), MULTICAST_IP, PORT );
 
 	for (int i=0; i<NUM_SLAVES; i++) {
-		slaves[i].setup( io_service(), "127.0.0.1", PORT, i );
+		slaves[i].setup( io_service(), "127.0.0.1", MULTICAST_IP, PORT, i );
 	}
 
     gui = params::InterfaceGl::create( "Params", ivec2( 200, 110 ) );

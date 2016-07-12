@@ -30,7 +30,7 @@ class Slave : public SlaveDriverBase {
 public:
 
 	//! Connect to master
-    void setup( asio::io_service& _ioService, std::string _ip, int _port, int _id );
+    void setup( asio::io_service& _ioService, std::string _serverIp, std::string _multicastIp,  int _port, int _id );
 
 	//! Process received messages
 	void update();
@@ -61,10 +61,13 @@ private:
 	TcpSessionRef				session;
 	std::string					host;
 
-	UdpClientRef    			clientUdp;
-	UdpSessionRef   			sessionUdp;
-	void						onConnectUdp( UdpSessionRef _session );
-	void						onReadUdp( ci::BufferRef buffer );
+	asio::ip::udp::endpoint 	udpEndpoint;
+	asio::ip::udp::socket 		*udpSocket;
+
+	enum { udpMax = 1024 };
+	char udpData[udpMax];
+
+	void 						udpHandleReceive( const asio::error_code &error, size_t bytes_recvd );
 
 	void						onConnect( TcpSessionRef _session );
 	void						onError( std::string err, size_t bytesTransferred );

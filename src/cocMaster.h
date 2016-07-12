@@ -31,7 +31,7 @@ class Master : public SlaveDriverBase {
 public:
 
 	//! Start listening for client connections
-    void setup(  asio::io_service& _ioService, std::string _ip, int _port );
+    void setup(  asio::io_service& _ioService, std::string _multicastIp, int _port );
 
 	//! Call to send message
 	void update( float _delta );
@@ -43,20 +43,17 @@ public:
 private:
 
 	void writeToAll( ci::BufferRef _buf );
-	bool allRepliesReceived();
 
     TcpServerRef				serverTcp;
 	std::vector<TcpSessionRef>	sessions;
 
-	UdpClientRef    			clientUdp;
-	UdpSessionRef   			sessionUdp;
-
 	int32_t						lastFrameSent = -1;
-	int 						numReplies = 0;
 
-	void 						onConnect( UdpSessionRef session );
-//	void						onWriteUdp( size_t bytesTransferred ) { ci::app::console()<<"wrote udp bytes "<<bytesTransferred<<std::endl; };
+	asio::ip::udp::endpoint 	udpEndpoint;
+	asio::ip::udp::socket 		*udpSocket;
 
+	void 						udpHandleSend( const asio::error_code &error );
+	void 						udpSend();
 
 	void						accept();
     void						onAccept( TcpSessionRef _session );

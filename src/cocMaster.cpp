@@ -29,7 +29,7 @@ using namespace std;
 
 namespace coc{
     
-void Master::setup( asio::io_service& _ioService, std::string _ip, int _port )
+void Master::setup( asio::io_service& _ioService, std::string _multicastIp, int _port )
 {
     SlaveDriverBase::setup();
 
@@ -47,37 +47,9 @@ void Master::setup( asio::io_service& _ioService, std::string _ip, int _port )
 
     // UDP
 
-    clientUdp = UdpClient::create( _ioService );
+    udpEndpoint = asio::ip::udp::endpoint( asio::ip::address::from_string(_multicastIp), (short) port);
+    udpSocket = new asio::ip::udp::socket( _ioService, udpEndpoint.protocol() );
 
-    clientUdp->connectConnectEventHandler( &Master::onConnect, this );
-    clientUdp->connectErrorEventHandler( &Master::onError, this );
-//    clientUdp->connectResolveEventHandler( [ & ]()
-//    {
-//        console()<< "Endpoint resolved"<<endl;
-//    } );
-
-    clientUdp->connect( _ip, port);
-}
-
-void Master::onConnect( UdpSessionRef session )
-{
-    sessionUdp = session;
-    sessionUdp->connectErrorEventHandler( &Master::onError, this );
-//    sessionUdp->connectWriteEventHandler( &Master::onWriteUdp, this );
-
-    sessionUdp->getSocket()->set_option(asio::ip::udp::socket::reuse_address(true));
-    sessionUdp->getSocket()->set_option(asio::socket_base::broadcast(true));
-
-//    sessionUdp->connectReadCompleteEventHandler( &Master::onReadComplete, this );
-//    sessionUdp->connectReadEventHandler( &Master::onRead, this );
-
-}
-
-
-bool Master::allRepliesReceived()
-{
-    if (getElapsedSeconds() < 3) return true;
-    return numReplies == sessions.size();
 }
 
 
@@ -102,23 +74,27 @@ void Master::update( float _delta )
     bytesOutUdp.addPair('F', (uint32_t)lastFrameSent );
     bytesOutUdp.addPair('T', (double)_delta );
 
-    if ( sessionUdp && sessionUdp->getSocket()->is_open() ) {
-        sessionUdp->write( bytesOutUdp.getBuffer() );
-    }
+    udpSend();
 
     bytesOutUdp.clear();
 
+}
 
 
-//    if ( allRepliesReceived()) {
-//          //process
-//
-//        numReplies = 0;
-//    }
-//    else {
-//        CI_LOG_E("Not all replies in time, only " << numReplies << " of " << sessions.size() );
-//    }
+void Master::udpHandleSend( const asio::error_code &error )
+{
+    if (error) CI_LOG_E("UDP error");
+}
 
+void Master::udpSend()
+{
+    std::ostringstream os;
+    os << "Message " << lastFrameSent++;
+
+    udpSocket->async_send_to(
+            asio::buffer(os.str()), udpEndpoint,
+            bind( &Master::udpHandleSend, this,
+                    std::placeholders::_1 ));//error
 }
 
 

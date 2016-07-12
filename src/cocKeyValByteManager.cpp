@@ -58,7 +58,7 @@ void KeyValByteManager::processBytes( const char * _start, size_t _length )
 
 void KeyValByteManager::processBuffer( ci::BufferRef buffer )
 {
-	UInt8 result[4];
+	Byte result[4];
 	Byte dArray[sizeof( double )] = { 0 };
 
 	size_t i = 0, j = 0;

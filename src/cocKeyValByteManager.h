@@ -47,6 +47,9 @@ public:
 	//! Add pair with double value
 	void addPair( char key, double value );
 
+	//! Turn bytes into pairs
+	void processBytes( const char * _start, size_t _length );
+
 	//! Turn buffer into pairs
 	void processBuffer( ci::BufferRef buffer );
 

@@ -88,13 +88,13 @@ void Master::udpHandleSend( const asio::error_code &error )
 
 void Master::udpSend()
 {
-    std::ostringstream os;
-    os << "Message " << lastFrameSent++;
 
     udpSocket->async_send_to(
-            asio::buffer(os.str()), udpEndpoint,
+            asio::buffer( bytesOutUdp.getBuffer()->getData(), bytesOutUdp.getBuffer()->getSize() ),//todo: optimise
+            udpEndpoint,
             bind( &Master::udpHandleSend, this,
                     std::placeholders::_1 ));//error
+
 }
 
 

@@ -48,6 +48,14 @@ ci::BufferRef KeyValByteManager::getBuffer()
 	return buf;
 }
 
+void KeyValByteManager::processBytes( const char * _start, size_t _length )
+{
+	ci::BufferRef buf = ci::Buffer::create( _length );
+	memcpy( buf->getData(), _start, _length );
+
+	processBuffer( buf );//todo: optimise, currently converting twice...
+}
+
 void KeyValByteManager::processBuffer( ci::BufferRef buffer )
 {
 	UInt8 result[4];

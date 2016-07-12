@@ -61,11 +61,7 @@ void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::str
 	udpSocket->set_option(
 			asio::ip::multicast::join_group(asio::ip::address::from_string(_multicastIp)));
 
-	udpSocket->async_receive_from(
-			asio::buffer(udpData, udpMax), udpEndpoint,
-			bind(&Slave::udpHandleReceive, this,
-					std::placeholders::_1,//error
-					std::placeholders::_2));//bytes_transferred
+	udpRead();
 
 }
 
@@ -76,17 +72,48 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 		CI_LOG_E("UDP error");
 	}
 	else {
-		std::cout.write(udpData, bytes_recvd);
-		std::cout << std::endl;
 
-		udpSocket->async_receive_from(
-				asio::buffer(udpData, udpMax), udpEndpoint,
-				bind(&Slave::udpHandleReceive, this,
-						std::placeholders::_1,//error
-						std::placeholders::_2));//bytes_transferred
+		//todo: optimise with bytes instead buffer
+		ci::BufferRef buf = ci::Buffer::create(udpData, bytes_recvd);
+		bytesInUdp.processBuffer(buf);
+
+		for ( KeyValByteBase * kv : bytesInUdp.getPairs() ) {
+
+
+			switch (kv->getKey()) {
+				case 'F':
+				{
+					coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
+					uint32_t newFrame = tmp->getValue();
+					if (newFrame != lastFrameReceived) {
+						hasFrameChanged = true;
+						lastFrameReceived = newFrame;
+					}
+				}
+					break;
+				case 'T':
+				{
+					coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
+					lastDeltaReceived = tmp->getValue();
+				}
+					break;
+			}
+
+		}
+
+		bytesInUdp.clear();
+
+		udpRead();
 	}
 }
 
+void Slave::udpRead() {
+	udpSocket->async_receive_from(
+			asio::buffer(udpData, udpMax), udpEndpoint,
+			bind(&Slave::udpHandleReceive, this,
+					std::placeholders::_1,//error
+					std::placeholders::_2));//bytes_transferred
+}
 
 void Slave::connect()
 {
@@ -203,22 +230,22 @@ void Slave::onRead( ci::BufferRef buffer )
 	for ( KeyValByteBase * kv : bytesInTcp.getPairs() ) {
 
 		switch (kv->getKey()) {
-			case 'F':
-			{
-				coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
-				uint32_t newFrame = tmp->getValue();
-				if (newFrame != lastFrameReceived) {
-					hasFrameChanged = true;
-					lastFrameReceived = newFrame;
-				}
-			}
-				break;
-			case 'T':
-			{
-				coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
-				lastDeltaReceived = tmp->getValue();
-			}
-				break;
+//			case 'F':
+//			{
+//				coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
+//				uint32_t newFrame = tmp->getValue();
+//				if (newFrame != lastFrameReceived) {
+//					hasFrameChanged = true;
+//					lastFrameReceived = newFrame;
+//				}
+//			}
+//				break;
+//			case 'T':
+//			{
+//				coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
+//				lastDeltaReceived = tmp->getValue();
+//			}
+//				break;
 		}
 
 	}

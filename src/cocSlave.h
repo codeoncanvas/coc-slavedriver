@@ -67,6 +67,7 @@ private:
 	enum { udpMax = 1024 };
 	char udpData[udpMax];
 
+	void						udpRead();
 	void 						udpHandleReceive( const asio::error_code &error, size_t bytes_recvd );
 
 	void						onConnect( TcpSessionRef _session );

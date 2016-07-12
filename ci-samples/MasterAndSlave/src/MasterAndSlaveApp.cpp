@@ -32,7 +32,7 @@ class MasterAndSlaveApp : public App {
 
 void MasterAndSlaveApp::setup()
 {
-    master.setup( io_service(), "127.0.0.255", PORT );
+    master.setup( io_service(), "192.168.1.255", PORT );
 
 	for (int i=0; i<NUM_SLAVES; i++) {
 		slaves[i].setup( io_service(), "127.0.0.1", PORT, i );

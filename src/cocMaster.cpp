@@ -63,8 +63,9 @@ void Master::onConnect( UdpSessionRef session )
 {
     sessionUdp = session;
     sessionUdp->connectErrorEventHandler( &Master::onError, this );
-//    sessionUdp->connectWriteEventHandler( &Master::onWrite, this );
+//    sessionUdp->connectWriteEventHandler( &Master::onWriteUdp, this );
 
+    sessionUdp->getSocket()->set_option(asio::ip::udp::socket::reuse_address(true));
     sessionUdp->getSocket()->set_option(asio::socket_base::broadcast(true));
 
 //    sessionUdp->connectReadCompleteEventHandler( &Master::onReadComplete, this );

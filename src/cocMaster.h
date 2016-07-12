@@ -55,6 +55,8 @@ private:
 	int 						numReplies = 0;
 
 	void 						onConnect( UdpSessionRef session );
+//	void						onWriteUdp( size_t bytesTransferred ) { ci::app::console()<<"wrote udp bytes "<<bytesTransferred<<std::endl; };
+
 
 	void						accept();
     void						onAccept( TcpSessionRef _session );
@@ -63,7 +65,7 @@ private:
     void						onError( std::string err, size_t bytesTransferred );
     void						onRead( ci::BufferRef buffer );
     void						onReadComplete();
-    void						onWrite( size_t bytesTransferred );
+	void						onWrite( size_t bytesTransferred );
     
 };//class Master
 

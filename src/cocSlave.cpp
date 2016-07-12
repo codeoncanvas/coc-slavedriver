@@ -55,18 +55,20 @@ void Slave::setup( asio::io_service& _ioService, std::string _ip, int _port, int
 
 	clientUdp->connectConnectEventHandler( &Slave::onConnectUdp, this );
 	clientUdp->connectErrorEventHandler( &Slave::onError, this );
-//    clientUdp->connectResolveEventHandler( [ & ]()
-//    {
-//        console()<< "Endpoint resolved"<<endl;
-//    } );
+    clientUdp->connectResolveEventHandler( [ & ]()
+    {
+        console()<< "Slave UDP endpoint resolved"<<endl;
+    } );
 
-	clientUdp->connect( "127.0.0.1", port);
+	clientUdp->connect( "0.0.0.0", port);
 
 }
 
 
 void Slave::onConnectUdp( UdpSessionRef session )
 {
+	console()<< "UDP connected"<<endl;
+
 	sessionUdp = session;
 	sessionUdp->connectErrorEventHandler( &Slave::onError, this );
 //    sessionUdp->connectWriteEventHandler( &Master::onWrite, this );
@@ -74,7 +76,12 @@ void Slave::onConnectUdp( UdpSessionRef session )
 
     sessionUdp->connectReadEventHandler( &Slave::onReadUdp, this );
 
+	sessionUdp->getSocket()->set_option(asio::ip::udp::socket::reuse_address(true));
+	sessionUdp->getSocket()->set_option(asio::socket_base::broadcast(true));
+
 	sessionUdp->read();
+
+
 }
 
 

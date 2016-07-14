@@ -28,9 +28,9 @@ namespace coc {
 
 void SlaveDriverBase::setup() {
 
-	bytesInTcp.getMap()['F'] = coc::KV_INT32;
-	bytesInTcp.getMap()['T'] = coc::KV_DOUBLE;
-	bytesInTcp.getMap()['S'] = coc::KV_DOUBLE;
+	bytesInTcp.getMap()['F'] = coc::KV_INT32;	//frame number, used as message ID - must be first in UDP packet
+	bytesInTcp.getMap()['T'] = coc::KV_DOUBLE;	//time Delta
+	bytesInTcp.getMap()['A'] = coc::KV_DOUBLE;	//absolute time, timeline::appTime
 
 	bytesOutTcp = bytesOutUdp = bytesInUdp = bytesInTcp;
 }

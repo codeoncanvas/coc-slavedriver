@@ -42,17 +42,20 @@ public:
 	bool getHasFrameChanged();
 
 	//! Get last time delta received
-	float getTimeDelta();
+	double getTimeDelta();
+
+	//! Get last timeline::appTime received
+	double getTimeApp();
 
 
 private:
 
 	void connect();
 	void write( ci::BufferRef _buf );
-	void reply();
 
-	uint32_t 					lastFrameReceived = -1;
-	double 						lastDeltaReceived = -1;
+	uint32_t 					lastFrameReceived = 0;
+	double 						lastDeltaReceived = 0;
+	double 						lastAppTimeReceived = 0;
 	bool 						hasFrameChanged = false;
 	double						lastConnectionAttempt;
 	double 						connectionAttemptInterval = 5.0f;

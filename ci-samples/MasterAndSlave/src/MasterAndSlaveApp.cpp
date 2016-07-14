@@ -6,7 +6,7 @@
 #include "cocMaster.h"
 #include "cocSlave.h"
 
-#define NUM_SLAVES			1
+#define NUM_SLAVES			5
 #define PORT				20001
 #define MULTICAST_IP		"239.255.0.1"
 
@@ -59,7 +59,7 @@ void MasterAndSlaveApp::update()
 
 
 	delta = getElapsedSeconds() - lastTime;
-	master.update(delta);
+	master.update(delta, getElapsedSeconds());
 	lastTime = getElapsedSeconds();
 
 

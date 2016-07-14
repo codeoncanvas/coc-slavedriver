@@ -1,0 +1,153 @@
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1A0D0BAA-7AB0-4A06-90C5-19AA04CB6458}</ProjectGuid>
+    <RootNamespace>Master</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\include;"..\..\..\..\..\_cinder\Cinder.git\include";..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src;..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>"..\..\..\..\..\_cinder\Cinder.git\include";..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>cinder-$(PlatformToolset)_d.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"..\..\..\..\..\_cinder\Cinder.git\lib\msw\$(PlatformTarget)"</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <IgnoreSpecificDefaultLibraries>LIBCMT;LIBCPMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\include;"..\..\..\..\..\_cinder\Cinder.git\include";..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src;..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32_WINNT=0x0601;_WINDOWS;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>"..\..\..\..\..\_cinder\Cinder.git\include";..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>cinder-$(PlatformToolset).lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"..\..\..\..\..\_cinder\Cinder.git\lib\msw\$(PlatformTarget)"</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding />
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources.rc" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <ClCompile Include="..\src\MasterApp.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ClientInterface.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\DispatcherInterface.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ServerInterface.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\SessionInterface.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpClient.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpServer.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpSession.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpClient.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpServer.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpSession.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\WaitTimer.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocKeyValByteManager.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocMaster.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocSlave.cpp" />
+    <ClCompile Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocSlaveDriverBase.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\Resources.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\CinderAsio.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ClientEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ClientInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\DispatcherEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\DispatcherInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ServerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\ServerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\SessionEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\SessionInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpClient.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpClientEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpServer.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpServerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpSession.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\TcpSessionEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpClient.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpClientEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpServer.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpServerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpSession.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\UdpSessionEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\WaitTimer.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\Cinder-Asio\src\WaitTimerEventHandlerInterface.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocKeyValByteManager.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocMaster.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocSlave.h" />
+    <ClInclude Include="..\..\..\..\..\_cinder\Cinder.git\blocks\coc-slavedriver\src\cocSlaveDriverBase.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

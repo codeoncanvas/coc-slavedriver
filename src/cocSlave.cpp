@@ -85,16 +85,27 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 				{
 					coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
 					uint32_t newFrame = tmp->getValue();
-					if (newFrame != lastFrameReceived) {
+
+					if (newFrame <= lastFrameReceived) { //duplicate/old packet
+						bytesInUdp.clear();
+					}
+					else {
 						hasFrameChanged = true;
 						lastFrameReceived = newFrame;
 					}
+
 				}
 					break;
 				case 'T':
 				{
 					coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
 					lastDeltaReceived = tmp->getValue();
+				}
+					break;
+				case 'A':
+				{
+					coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
+					lastAppTimeReceived = tmp->getValue();
 				}
 					break;
 			}
@@ -136,9 +147,14 @@ void Slave::update() {
 }
 
 
-float Slave::getTimeDelta()
+double Slave::getTimeDelta()
 {
 	return lastDeltaReceived;
+}
+
+double Slave::getTimeApp()
+{
+	return lastAppTimeReceived;
 }
 
 
@@ -151,6 +167,7 @@ void Slave::drawDebug( ci::ivec2 pos )
 	text += "connected? " + toString( isConnected ) + "\n";
 	text += "lastFrame= " + toString( lastFrameReceived ) + "\n";
 	text += "lastDelta= " + toString( lastDeltaReceived ) + "\n";
+	text += "lastAppTime= " + toString( lastAppTimeReceived ) + "\n";
 
 	TextBox textbox;
 	textbox.setText(text);
@@ -165,18 +182,6 @@ bool Slave::getHasFrameChanged()
 	hasFrameChanged = false;
 	return b;
 }
-
-
-void Slave::reply()
-{
-
-	bytesOutTcp.addPair('S',(uint32_t)slaveId);
-	bytesOutTcp.addPair('F',(double)lastFrameReceived);
-	write(bytesOutTcp.getBuffer());
-	bytesOutTcp.clear();
-
-}
-
 
 void Slave::write( BufferRef _buf ) {
 	if (session && session->getSocket()->is_open()) {
@@ -230,21 +235,7 @@ void Slave::onRead( ci::BufferRef buffer )
 	for ( KeyValByteBase * kv : bytesInTcp.getPairs() ) {
 
 		switch (kv->getKey()) {
-//			case 'F':
-//			{
-//				coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
-//				uint32_t newFrame = tmp->getValue();
-//				if (newFrame != lastFrameReceived) {
-//					hasFrameChanged = true;
-//					lastFrameReceived = newFrame;
-//				}
-//			}
-//				break;
-//			case 'T':
-//			{
-//				coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
-//				lastDeltaReceived = tmp->getValue();
-//			}
+//			case '':
 //				break;
 		}
 
@@ -252,7 +243,6 @@ void Slave::onRead( ci::BufferRef buffer )
 
 	bytesInTcp.clear();
 
-	reply();
 }
 
 void Slave::onWrite( size_t bytesTransferred )

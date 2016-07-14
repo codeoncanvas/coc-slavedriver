@@ -53,18 +53,17 @@ void Master::setup( asio::io_service& _ioService, std::string _multicastIp, int 
 }
 
 
-void Master::update( float _delta )
+void Master::update( double _delta, double _appTime )
 {
     lastFrameSent = getElapsedFrames();
 
     // TCP
 
-    bytesOutTcp.addPair('F', (uint32_t)lastFrameSent );
-    bytesOutTcp.addPair('T', (double)_delta );
+    if (bytesOutTcp.getPairs().size()) { //if pairs have been added before update called
+        writeToAll( bytesOutTcp.getBuffer() );
+        bytesOutTcp.clear();
+    }
 
-    writeToAll( bytesOutTcp.getBuffer() );
-
-    bytesOutTcp.clear();
 
     for ( auto session : sessions) session->read();
 
@@ -72,7 +71,8 @@ void Master::update( float _delta )
     // UDP
 
     bytesOutUdp.addPair('F', (uint32_t)lastFrameSent );
-    bytesOutUdp.addPair('T', (double)_delta );
+    bytesOutUdp.addPair('T', _delta );
+    bytesOutUdp.addPair('A', _appTime );
 
     udpSend();
 
@@ -195,20 +195,14 @@ void Master::onRead( BufferRef buffer )
 //    for ( KeyValByteBase * kv : bytesInTcp.getPairs() ) {
 //
 //        switch (kv->getKey()) {
-//            case 'F':
-//            {
-//                coc::KeyValByte<int32_t>* tmp = (coc::KeyValByte<int32_t>*) kv;
-//            }
+//            case '':
 //                break;
 //            case 'T':
-//            {
-//                coc::KeyValByte<double>* tmp = (coc::KeyValByte<double>*) kv;
-//            }
-//                break;
 //        }
 //
 //    }
 
+    bytesInTcp.clear();
 }
 
 void Master::onReadComplete()

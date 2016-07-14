@@ -34,7 +34,7 @@ public:
     void setup(  asio::io_service& _ioService, std::string _multicastIp, int _port );
 
 	//! Call to send message
-	void update( float _delta );
+	void update( double _delta, double _appTime );
 
 	//! Draw debug text to screen
 	void drawDebug( ci::ivec2 pos ) override;

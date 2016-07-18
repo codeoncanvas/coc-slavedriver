@@ -39,6 +39,8 @@ public:
 	//! Draw debug text to screen
 	void drawDebug( ci::ivec2 pos ) override;
 
+	//! Sends then clears messages, must be called after update
+	void send() override;
     
 private:
 

@@ -33,6 +33,12 @@ public:
 	void setup();
 
 	virtual void drawDebug( ci::ivec2 pos ) {};
+	virtual void send() {};
+
+	coc::KeyValByteManager & getTcpIn() { return bytesInTcp; }
+	coc::KeyValByteManager & getTcpOut() { return bytesOutTcp; }
+	coc::KeyValByteManager & getUdpIn() { return bytesInUdp; }
+	coc::KeyValByteManager & getUdpOut() { return bytesOutUdp; }
 
 protected:
 

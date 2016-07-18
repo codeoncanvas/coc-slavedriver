@@ -47,6 +47,9 @@ public:
 	//! Get last timeline::appTime received
 	double getTimeApp();
 
+	//! Sends then clears messages, must be called after update
+	void send() override;
+
 
 private:
 

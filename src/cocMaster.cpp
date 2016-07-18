@@ -55,29 +55,38 @@ void Master::setup( asio::io_service& _ioService, std::string _multicastIp, int 
 
 void Master::update( double _delta, double _appTime )
 {
+
+    // UDP
+
     lastFrameSent = getElapsedFrames();
 
+    bytesOutUdp.addPair('F', (uint32_t)lastFrameSent );
+    bytesOutUdp.addPair('T', _delta );
+    bytesOutUdp.addPair('A', _appTime );
+
+}
+
+
+void Master::send()
+{
     // TCP
+
+    bytesInTcp.clear();
 
     if (bytesOutTcp.getPairs().size()) { //if pairs have been added before update called
         writeToAll( bytesOutTcp.getBuffer() );
         bytesOutTcp.clear();
     }
 
-
     for ( auto session : sessions) session->read();
-
 
     // UDP
 
-    bytesOutUdp.addPair('F', (uint32_t)lastFrameSent );
-    bytesOutUdp.addPair('T', _delta );
-    bytesOutUdp.addPair('A', _appTime );
+    bytesInUdp.clear();
 
     udpSend();
 
     bytesOutUdp.clear();
-
 }
 
 
@@ -197,12 +206,10 @@ void Master::onRead( BufferRef buffer )
 //        switch (kv->getKey()) {
 //            case '':
 //                break;
-//            case 'T':
 //        }
 //
 //    }
 
-    bytesInTcp.clear();
 }
 
 void Master::onReadComplete()

@@ -112,9 +112,7 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 
 		}
 
-		bytesInUdp.clear();
 
-		udpRead();
 	}
 }
 
@@ -145,6 +143,24 @@ void Slave::update() {
 	}
 
 }
+
+void Slave::send()
+{
+	//TCP
+
+	bytesInTcp.clear();
+
+	//todo: implement sending
+
+	bytesOutTcp.clear();
+
+	//UDP
+
+	bytesInUdp.clear();
+
+	udpRead();
+}
+
 
 
 double Slave::getTimeDelta()
@@ -240,8 +256,6 @@ void Slave::onRead( ci::BufferRef buffer )
 		}
 
 	}
-
-	bytesInTcp.clear();
 
 }
 

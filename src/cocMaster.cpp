@@ -221,5 +221,17 @@ void Master::onWrite( size_t bytesTransferred )
 {
         CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
 }
-    
+
+
+void Master::cleanup()
+{
+    for ( auto session : sessions) {
+        if (session && session->getSocket()->is_open()) {
+            session->close();
+        }
+    }
+
+}
+
+
 }//namespace coc

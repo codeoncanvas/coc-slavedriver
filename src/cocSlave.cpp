@@ -264,4 +264,12 @@ void Slave::onWrite( size_t bytesTransferred )
 //	CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
 }
 
+
+void Slave::cleanup()
+{
+	if (session && session->getSocket()->is_open()) {
+		session->close();
+	}
+}
+
 }//namespace coc

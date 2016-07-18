@@ -50,6 +50,8 @@ public:
 	//! Sends then clears messages, must be called after update
 	void send() override;
 
+	void cleanup() override;
+
 
 private:
 

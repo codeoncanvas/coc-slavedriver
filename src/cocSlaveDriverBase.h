@@ -31,9 +31,11 @@ class SlaveDriverBase {
 public:
 
 	void setup();
+	void addType( char key, coc::KeyValByteType type );
 
 	virtual void drawDebug( ci::ivec2 pos ) {};
 	virtual void send() {};
+	virtual void cleanup() {};
 
 	coc::KeyValByteManager & getTcpIn() { return bytesInTcp; }
 	coc::KeyValByteManager & getTcpOut() { return bytesOutTcp; }

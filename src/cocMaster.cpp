@@ -37,13 +37,16 @@ void Master::setup( asio::io_service& _ioService, std::string _multicastIp, int 
 
     // TCP
 
-    serverTcp = TcpServer::create( _ioService );
+    if (useTcp) {
+        serverTcp = TcpServer::create( _ioService );
 
-    serverTcp->connectAcceptEventHandler( &Master::onAccept, this );
-    serverTcp->connectCancelEventHandler( &Master::onCancel, this );
-    serverTcp->connectErrorEventHandler( &Master::onError, this );
+        serverTcp->connectAcceptEventHandler( &Master::onAccept, this );
+        serverTcp->connectCancelEventHandler( &Master::onCancel, this );
+        serverTcp->connectErrorEventHandler( &Master::onError, this );
 
-    accept();
+        accept();
+
+    }
 
     // UDP
 
@@ -71,14 +74,19 @@ void Master::send()
 {
     // TCP
 
-    bytesInTcp.clear();
+    if (useTcp) {
+        bytesInTcp.clear();
 
-    if (bytesOutTcp.getPairs().size()) { //if pairs have been added before update called
-        writeToAll( bytesOutTcp.getBuffer() );
-        bytesOutTcp.clear();
+        if (bytesOutTcp.getPairs().size()) { //if pairs have been added before update called
+            writeToAll( bytesOutTcp.getBuffer() );
+            bytesOutTcp.clear();
+        }
+
+        for ( auto session : sessions) {
+            if (session->getSocket()->is_open()) session->read();
+        }
     }
 
-    for ( auto session : sessions) session->read();
 
     // UDP
 

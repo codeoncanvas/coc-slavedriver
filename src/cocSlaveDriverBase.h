@@ -44,6 +44,8 @@ public:
 
 protected:
 
+	bool useTcp = false;
+
 	coc::KeyValByteManager			bytesInTcp, bytesOutTcp;
 	coc::KeyValByteManager			bytesInUdp, bytesOutUdp;
 

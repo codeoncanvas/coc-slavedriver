@@ -38,16 +38,19 @@ void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::str
 
 	// TCP
 
-	client = TcpClient::create( _ioService );
+	if (useTcp) {
+		client = TcpClient::create( _ioService );
 
-	client->connectConnectEventHandler( &Slave::onConnect, this );
-	client->connectErrorEventHandler( &Slave::onError, this );
-	client->connectResolveEventHandler( [ & ]()
-	{
-		CI_LOG_I( "Endpoint resolved" );
-	} );
+		client->connectConnectEventHandler( &Slave::onConnect, this );
+		client->connectErrorEventHandler( &Slave::onError, this );
+		client->connectResolveEventHandler( [ & ]()
+		{
+			CI_LOG_I( "Endpoint resolved" );
+		} );
 
-	lastConnectionAttempt = -connectionAttemptInterval;
+		lastConnectionAttempt = -connectionAttemptInterval;
+	}
+
 
 	// UDP
 
@@ -133,14 +136,17 @@ void Slave::connect()
 
 void Slave::update() {
 
-	if (!session && getElapsedSeconds() - lastConnectionAttempt > connectionAttemptInterval) {
-		connect();
-		lastConnectionAttempt = getElapsedSeconds();
-	}
-	else if (session) {
+	if (useTcp) {
+		if (!session && getElapsedSeconds() - lastConnectionAttempt > connectionAttemptInterval) {
+			connect();
+			lastConnectionAttempt = getElapsedSeconds();
+		}
+		else if (session && session->getSocket()->is_open()) {
 
-		session->read();
+			session->read();
+		}
 	}
+
 
 }
 
@@ -148,11 +154,13 @@ void Slave::send()
 {
 	//TCP
 
-	bytesInTcp.clear();
+	if (useTcp) {
+		bytesInTcp.clear();
 
-	//todo: implement sending
+		//todo: implement sending
 
-	bytesOutTcp.clear();
+		bytesOutTcp.clear();
+	}
 
 	//UDP
 

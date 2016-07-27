@@ -72,7 +72,7 @@ private:
 	asio::ip::udp::endpoint 	udpEndpoint;
 	asio::ip::udp::socket 		*udpSocket;
 
-	enum { udpMax = 1024 };
+	enum { udpMax = 128 };
 	char udpData[udpMax];
 
 	void						udpRead();

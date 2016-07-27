@@ -80,7 +80,10 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 		ci::BufferRef buf = ci::Buffer::create(udpData, bytes_recvd);
 
 		udpMutex.lock();
-
+		if (bytesInUdp.getPairs().size()) {
+			bytesInUdp.clear();
+//			CI_LOG_E("Too slow to process UDP");
+		}
 		bytesInUdp.processBuffer(buf);
 
 		for ( KeyValByteBase * kv : bytesInUdp.getPairs() ) {

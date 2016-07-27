@@ -14,6 +14,9 @@ namespace coc {
 class KeyValByteBase {
 
 public:
+
+	virtual ~KeyValByteBase() {};
+
 	void setKey( char c ) { key = c; };
 	char getKey() { return key; };
 
@@ -26,6 +29,8 @@ template<typename T>
 class KeyValByte : public KeyValByteBase {
 
 public:
+
+	~KeyValByte() override {};
 
 	void setValue( T v ) { value = v; };
 	T getValue() { return value; };

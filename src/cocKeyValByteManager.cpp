@@ -109,7 +109,10 @@ void KeyValByteManager::clear()
 {
 	byteArray.clear();
 
-	for (int i=kvPairs.size()-1; i>=0; i--) delete kvPairs[i];//todo: check if not casting creates leak
+	for (auto it = kvPairs.begin() ; it != kvPairs.end(); ++it)
+	{
+		delete (*it);
+	}
 	kvPairs.clear();
 }
 

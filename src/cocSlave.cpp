@@ -78,6 +78,9 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 
 		//todo: optimise with bytes instead buffer
 		ci::BufferRef buf = ci::Buffer::create(udpData, bytes_recvd);
+
+		udpMutex.lock();
+
 		bytesInUdp.processBuffer(buf);
 
 		for ( KeyValByteBase * kv : bytesInUdp.getPairs() ) {
@@ -115,6 +118,7 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 
 		}
 
+		udpMutex.unlock();
 
 	}
 }
@@ -163,8 +167,9 @@ void Slave::send()
 	}
 
 	//UDP
-
+	udpMutex.lock();
 	bytesInUdp.clear();
+	udpMutex.unlock();
 
 	udpRead();
 }

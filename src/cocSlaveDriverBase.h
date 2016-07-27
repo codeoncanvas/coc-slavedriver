@@ -42,6 +42,9 @@ public:
 	coc::KeyValByteManager & getUdpIn() { return bytesInUdp; }
 	coc::KeyValByteManager & getUdpOut() { return bytesOutUdp; }
 
+	std::mutex & getUdpMutex() { return udpMutex; }
+	std::mutex & getTcpMutex() { return tcpMutex; }
+
 protected:
 
 	bool useTcp = false;
@@ -51,6 +54,8 @@ protected:
 
 	bool 							disableNagle = false;
 	int32_t							port;
+
+	std::mutex						udpMutex, tcpMutex;
 
 
 };//class cocSlaveDriverBase

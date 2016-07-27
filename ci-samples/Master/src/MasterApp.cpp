@@ -19,6 +19,7 @@ public:
     void mouseDown( MouseEvent event ) override;
     void update() override;
     void draw() override;
+    void cleanup() override;
     
     coc::Master  master;
     
@@ -55,7 +56,7 @@ void MasterApp::update()
     delta = getElapsedSeconds() - lastTime;
     master.update(delta, getElapsedSeconds());
     lastTime = getElapsedSeconds();
-    
+    master.send();
     
 }
 
@@ -68,6 +69,11 @@ void MasterApp::draw()
     
     gui->draw();
     
+}
+
+void MasterApp::cleanup()
+{
+    master.cleanup();
 }
 
 CINDER_APP( MasterApp, RendererGl )

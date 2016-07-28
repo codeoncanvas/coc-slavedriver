@@ -19,6 +19,7 @@ public:
     void mouseDown( MouseEvent event ) override;
     void update() override;
     void draw() override;
+    void cleanup() override;
     
     coc::Slave   slave;
     
@@ -53,6 +54,7 @@ void SlaveApp::update()
     fps = getAverageFps();
     
     slave.update();
+    slave.send();
     
 }
 
@@ -65,6 +67,11 @@ void SlaveApp::draw()
     
     gui->draw();
     
+}
+
+void SlaveApp::cleanup()
+{
+    slave.cleanup();
 }
 
 CINDER_APP( SlaveApp, RendererGl )

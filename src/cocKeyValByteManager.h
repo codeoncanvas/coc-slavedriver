@@ -30,7 +30,7 @@ class KeyValByte : public KeyValByteBase {
 
 public:
 
-	~KeyValByte() override {};
+	~KeyValByte() {};
 
 	void setValue( T v ) { value = v; };
 	T getValue() { return value; };

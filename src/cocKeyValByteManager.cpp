@@ -109,10 +109,16 @@ void KeyValByteManager::clear()
 {
 	byteArray.clear();
 
-	for (auto it = kvPairs.begin() ; it != kvPairs.end(); ++it)
-	{
-		delete (*it);
+//	for (auto it = kvPairs.begin() ; it != kvPairs.end(); ++it)
+//	{
+//		delete (*it);
+//	}
+
+	while (!kvPairs.empty()) {
+		delete kvPairs.back();
+		kvPairs.erase(kvPairs.end()-1);
 	}
+
 	kvPairs.clear();
 }
 

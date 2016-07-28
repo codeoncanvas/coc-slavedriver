@@ -113,13 +113,20 @@ void KeyValByteManager::clear()
 //	{
 //		delete (*it);
 //	}
+//	kvPairs.clear();
+	
+	//todo: remove hack:
+#ifdef CINDER_MSW
+#if DEBUG
+	return;
+#endif
+#endif
 
 	while (!kvPairs.empty()) {
 		delete kvPairs.back();
-		kvPairs.erase(kvPairs.end()-1);
+		kvPairs.erase(kvPairs.end() - 1);
 	}
 
-	kvPairs.clear();
 }
 
 

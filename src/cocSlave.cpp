@@ -79,7 +79,6 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 		//todo: optimise with bytes instead buffer
 		ci::BufferRef buf = ci::Buffer::create(udpData, bytes_recvd);
 
-		udpMutex.lock();
 		if (bytesInUdp.getPairs().size()) {
 			bytesInUdp.clear();
 //			CI_LOG_E("Too slow to process UDP");
@@ -121,7 +120,6 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 
 		}
 
-		udpMutex.unlock();
 
 	}
 }
@@ -170,9 +168,7 @@ void Slave::send()
 	}
 
 	//UDP
-	udpMutex.lock();
 	bytesInUdp.clear();
-	udpMutex.unlock();
 
 	udpRead();
 }

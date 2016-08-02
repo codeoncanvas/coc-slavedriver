@@ -52,6 +52,7 @@ public:
 
 	void cleanup() override;
 
+	uint32_t getLastFrameReceived() { return lastFrameReceived; }
 
 private:
 

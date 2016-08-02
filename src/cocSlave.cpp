@@ -63,7 +63,7 @@ void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::str
 
 	udpRead();
 
-	lastReceivedUdp = getElapsedSeconds();
+//	lastReceivedUdp = getElapsedSeconds();
 }
 
 void Slave::joinGroup()
@@ -154,17 +154,20 @@ void Slave::connect()
 
 void Slave::update() {
 
-	if (!isJoined && getElapsedSeconds() > 10) { //delay joining group on launch to avoid delays
+	if (!isJoined && getElapsedSeconds() > 5) { //delay joining group on launch to avoid delays
 		CI_LOG_I("Joining multicast group for first time");
 		joinGroup();
-		lastReceivedUdp = getElapsedSeconds();
+//		lastReceivedUdp = getElapsedSeconds();
 	}
-	else if (isJoined && getElapsedSeconds() - lastReceivedUdp > 10) { //try reconnecting to group if no messages
-		CI_LOG_E("Rejoining multicast group");
-		leaveGroup();
-		joinGroup();
-		lastReceivedUdp = getElapsedSeconds();
+	else if (isJoined && getElapsedSeconds() - lastReceivedUdp > 5) { //reset frame if master down
+		lastFrameReceived = 0;
 	}
+//	else if (isJoined && getElapsedSeconds() - lastReceivedUdp > 5) { //try reconnecting to group if no messages
+//		CI_LOG_E("Rejoining multicast group");
+//		leaveGroup();
+//		joinGroup();
+//		lastReceivedUdp = getElapsedSeconds();
+//	}
 
 	if (useTcp) {
 		if (!session && getElapsedSeconds() - lastConnectionAttempt > connectionAttemptInterval) {

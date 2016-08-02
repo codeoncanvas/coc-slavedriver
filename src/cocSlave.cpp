@@ -35,6 +35,7 @@ void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::str
 	host		= _serverIp;
 	port		= _port;
 	slaveId		= _id;
+	multicastIp = _multicastIp;
 
 	// TCP
 
@@ -60,12 +61,23 @@ void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::str
 	udpSocket->set_option(asio::ip::udp::socket::reuse_address(true));
 	udpSocket->bind(udpEndpoint);
 
-	// Join the multicast group.
-	udpSocket->set_option(
-			asio::ip::multicast::join_group(asio::ip::address::from_string(_multicastIp)));
-
 	udpRead();
 
+	lastReceivedUdp = getElapsedSeconds();
+}
+
+void Slave::joinGroup()
+{
+	udpSocket->set_option(
+			asio::ip::multicast::join_group(asio::ip::address::from_string(multicastIp)));
+	isJoined = true;
+}
+
+void Slave::leaveGroup()
+{
+	udpSocket->set_option(
+			asio::ip::multicast::leave_group(asio::ip::address::from_string(multicastIp)));
+	isJoined = false;
 }
 
 
@@ -75,6 +87,7 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 		CI_LOG_E("UDP error");
 	}
 	else {
+		lastReceivedUdp = getElapsedSeconds();
 
 		//todo: optimise with bytes instead buffer
 		ci::BufferRef buf = ci::Buffer::create(udpData, bytes_recvd);
@@ -140,6 +153,18 @@ void Slave::connect()
 
 
 void Slave::update() {
+
+	if (!isJoined && getElapsedSeconds() > 10) { //delay joining group on launch to avoid delays
+		CI_LOG_I("Joining multicast group for first time");
+		joinGroup();
+		lastReceivedUdp = getElapsedSeconds();
+	}
+	else if (isJoined && getElapsedSeconds() - lastReceivedUdp > 10) { //try reconnecting to group if no messages
+		CI_LOG_E("Rejoining multicast group");
+		leaveGroup();
+		joinGroup();
+		lastReceivedUdp = getElapsedSeconds();
+	}
 
 	if (useTcp) {
 		if (!session && getElapsedSeconds() - lastConnectionAttempt > connectionAttemptInterval) {

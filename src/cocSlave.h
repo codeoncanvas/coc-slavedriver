@@ -74,7 +74,12 @@ private:
 
 	enum { udpMax = 128 };
 	char udpData[udpMax];
+	std::string multicastIp;
+	bool isJoined = false;
+	double lastReceivedUdp;
 
+	void 						joinGroup();
+	void 						leaveGroup();
 	void						udpRead();
 	void 						udpHandleReceive( const asio::error_code &error, size_t bytes_recvd );
 

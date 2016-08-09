@@ -54,6 +54,9 @@ public:
 
 	uint32_t getLastFrameReceived() { return lastFrameReceived; }
 
+	void 						joinGroup();
+	void 						leaveGroup();
+
 private:
 
 	void connect();
@@ -79,8 +82,6 @@ private:
 	bool isJoined = false;
 	double lastReceivedUdp;
 
-	void 						joinGroup();
-	void 						leaveGroup();
 	void						udpRead();
 	void 						udpHandleReceive( const asio::error_code &error, size_t bytes_recvd );
 

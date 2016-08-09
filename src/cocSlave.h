@@ -80,6 +80,7 @@ private:
 	char udpData[udpMax];
 	std::string multicastIp;
 	bool isJoined = false;
+	bool hasJoinedAtStart = false;
 	double lastReceivedUdp;
 
 	void						udpRead();

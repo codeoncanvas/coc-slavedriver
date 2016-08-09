@@ -68,16 +68,22 @@ void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::str
 
 void Slave::joinGroup()
 {
+	if (isJoined) return;
+
 	udpSocket->set_option(
 			asio::ip::multicast::join_group(asio::ip::address::from_string(multicastIp)));
 	isJoined = true;
+	CI_LOG_I("Joined multicast group");
 }
 
 void Slave::leaveGroup()
 {
+	if (!isJoined) return;
+
 	udpSocket->set_option(
 			asio::ip::multicast::leave_group(asio::ip::address::from_string(multicastIp)));
 	isJoined = false;
+	CI_LOG_I("Left multicast group");
 }
 
 
@@ -156,9 +162,10 @@ void Slave::connect()
 
 void Slave::update() {
 
-	if (!isJoined && getElapsedSeconds() > 5) { //delay joining group on launch to avoid delays
-		CI_LOG_I("Joining multicast group for first time");
+	if (!isJoined && !hasJoinedAtStart && getElapsedSeconds() > 5) { //delay joining group on launch to avoid delays
+		CI_LOG_I("About to join multicast group for first time...");
 		joinGroup();
+		hasJoinedAtStart = true;
 //		lastReceivedUdp = getElapsedSeconds();
 	}
 	else if (isJoined && getElapsedSeconds() - lastReceivedUdp > 5) { //reset frame if master down

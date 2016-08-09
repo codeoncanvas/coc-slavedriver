@@ -90,7 +90,7 @@ void Slave::leaveGroup()
 void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd )
 {
 	if (error) {
-		CI_LOG_E("UDP error");
+		CI_LOG_E("UDP error: " << error.message() );
 	}
 	else {
 		lastReceivedUdp = getElapsedSeconds();
@@ -139,10 +139,11 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 
 		}
 
+		udpRead();//recursive read to ensure no backlog of messages
 
 	}
 
-	udpRead();//recursive read to ensure no backlog of messages
+
 }
 
 void Slave::udpRead() {

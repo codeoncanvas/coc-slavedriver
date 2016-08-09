@@ -73,7 +73,7 @@ private:
 	asio::ip::udp::endpoint 	udpEndpoint;
 	asio::ip::udp::socket 		*udpSocket;
 
-	enum { udpMax = 128 };
+	enum { udpMax = 64 };
 	char udpData[udpMax];
 	std::string multicastIp;
 	bool isJoined = false;

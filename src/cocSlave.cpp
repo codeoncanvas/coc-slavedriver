@@ -135,6 +135,8 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 
 
 	}
+
+	udpRead();//recursive read to ensure no backlog of messages
 }
 
 void Slave::udpRead() {

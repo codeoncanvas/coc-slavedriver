@@ -208,7 +208,7 @@ void Slave::send()
 	//UDP
 	bytesInUdp.clear();
 
-	udpRead();
+//	udpRead();
 }
 
 

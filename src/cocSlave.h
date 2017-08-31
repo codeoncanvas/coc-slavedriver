@@ -57,6 +57,8 @@ public:
 	void 						joinGroup();
 	void 						leaveGroup();
 
+	float 						delayJoin = 5;
+
 private:
 
 	void connect();

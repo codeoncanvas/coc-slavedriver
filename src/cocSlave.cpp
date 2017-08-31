@@ -163,7 +163,7 @@ void Slave::connect()
 
 void Slave::update() {
 
-	if (!isJoined && !hasJoinedAtStart && getElapsedSeconds() > 5) { //delay joining group on launch to avoid delays
+	if (!isJoined && !hasJoinedAtStart && getElapsedSeconds() > delayJoin) { //delay joining group on launch to avoid delays
 		CI_LOG_I("About to join multicast group for first time...");
 		joinGroup();
 		hasJoinedAtStart = true;

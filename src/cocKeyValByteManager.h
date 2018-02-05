@@ -1,3 +1,5 @@
+#pragma once
+
 #include "cinder/Buffer.h"
 
 //! \brief Class to help manage key value pairs as buffer of bytes for sending over network.

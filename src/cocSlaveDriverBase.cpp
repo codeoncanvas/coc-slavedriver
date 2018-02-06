@@ -37,8 +37,6 @@ void SlaveDriverBase::setup() {
 
 void SlaveDriverBase::addType( char key, coc::KeyValByteType type )
 {
-	bytesInTcp.getMap()[key] = type;
-	bytesOutTcp.getMap()[key] = type;
 	bytesInUdp.getMap()[key] = type;
 	bytesOutUdp.getMap()[key] = type;
 }

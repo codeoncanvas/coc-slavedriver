@@ -21,8 +21,8 @@
 
 #include "cinder/app/App.h"
 #include "cocKeyValByteManager.h"
-#include "UdpClient.h"
-#include "UdpSession.h"
+#include <asio/asio.hpp>
+#include <asio/ip/udp.hpp>
 
 namespace coc {
 
@@ -37,16 +37,11 @@ public:
 	virtual void send() {};
 	virtual void cleanup() {};
 
-	coc::KeyValByteManager & getTcpIn() { return bytesInTcp; }
-	coc::KeyValByteManager & getTcpOut() { return bytesOutTcp; }
 	coc::KeyValByteManager & getUdpIn() { return bytesInUdp; }
 	coc::KeyValByteManager & getUdpOut() { return bytesOutUdp; }
 
 protected:
 
-	bool useTcp = false;
-
-	coc::KeyValByteManager			bytesInTcp, bytesOutTcp;
 	coc::KeyValByteManager			bytesInUdp, bytesOutUdp;
 
 	bool 							disableNagle = false;

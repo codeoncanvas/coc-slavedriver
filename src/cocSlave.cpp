@@ -28,35 +28,17 @@ using namespace ci::app;
 
 namespace coc{
 
-void Slave::setup( asio::io_service& _ioService, std::string _serverIp, std::string _multicastIp, int _port, int _id ) {
+void Slave::setup( std::string _multicastIp, int _port ) {
 
 	SlaveDriverBase::setup();
 
-	host		= _serverIp;
 	port		= _port;
-	slaveId		= _id;
 	multicastIp = _multicastIp;
-
-	// TCP
-
-	if (useTcp) {
-		client = TcpClient::create( _ioService );
-
-		client->connectConnectEventHandler( &Slave::onConnect, this );
-		client->connectErrorEventHandler( &Slave::onError, this );
-		client->connectResolveEventHandler( [ & ]()
-		{
-			CI_LOG_I( "Endpoint resolved" );
-		} );
-
-		lastConnectionAttempt = -connectionAttemptInterval;
-	}
-
 
 	// UDP
 
 	udpEndpoint = asio::ip::udp::endpoint( asio::ip::address::from_string("0.0.0.0"), (short) port);
-	udpSocket = new asio::ip::udp::socket( _ioService );
+	udpSocket = new asio::ip::udp::socket( app::App::get()->io_service() );
 	udpSocket->open(udpEndpoint.protocol());
 	udpSocket->set_option(asio::ip::udp::socket::reuse_address(true));
 	udpSocket->bind(udpEndpoint);
@@ -95,7 +77,7 @@ void Slave::udpHandleReceive( const asio::error_code &error, size_t bytes_recvd 
 	else {
 		lastReceivedUdp = getElapsedSeconds();
 
-		//todo: optimise with bytes instead buffer
+		//todo: optimise with bytes instead buffer?
 		ci::BufferRef buf = ci::Buffer::create(udpData, bytes_recvd);
 
 		if (bytesInUdp.getPairs().size()) {
@@ -154,12 +136,6 @@ void Slave::udpRead() {
 					std::placeholders::_2));//bytes_transferred
 }
 
-void Slave::connect()
-{
-	CI_LOG_I( "Connecting to: " + host + ":" + toString( port ) );
-	client->connect( host, (uint16_t)port );
-}
-
 
 void Slave::update() {
 
@@ -172,38 +148,11 @@ void Slave::update() {
 	else if (isJoined && getElapsedSeconds() - lastReceivedUdp > 5) { //reset frame if master down
 		lastFrameReceived = 0;
 	}
-//	else if (isJoined && getElapsedSeconds() - lastReceivedUdp > 5) { //try reconnecting to group if no messages
-//		CI_LOG_E("Rejoining multicast group");
-//		leaveGroup();
-//		joinGroup();
-//		lastReceivedUdp = getElapsedSeconds();
-//	}
-
-	if (useTcp) {
-		if (!session && getElapsedSeconds() - lastConnectionAttempt > connectionAttemptInterval) {
-			connect();
-			lastConnectionAttempt = getElapsedSeconds();
-		}
-		else if (session && session->getSocket()->is_open()) {
-
-			session->read();
-		}
-	}
-
 
 }
 
 void Slave::send()
 {
-	//TCP
-
-	if (useTcp) {
-		bytesInTcp.clear();
-
-		//todo: implement sending
-
-		bytesOutTcp.clear();
-	}
 
 	//UDP
 	bytesInUdp.clear();
@@ -227,10 +176,7 @@ double Slave::getTimeApp()
 void Slave::drawDebug( ci::ivec2 pos )
 {
 
-	string text = "SLAVE " + toString(slaveId) + ":\n";
-	bool isConnected = false;
-	if (session) isConnected = true;
-	text += "connected? " + toString( isConnected ) + "\n";
+	string text = "SLAVE:\n";
 	text += "lastFrame= " + toString( lastFrameReceived ) + "\n";
 	text += "lastDelta= " + toString( lastDeltaReceived ) + "\n";
 	text += "lastAppTime= " + toString( lastAppTimeReceived ) + "\n";
@@ -249,77 +195,9 @@ bool Slave::getHasFrameChanged()
 	return b;
 }
 
-void Slave::write( BufferRef _buf ) {
-	if (session && session->getSocket()->is_open()) {
-		session->write( _buf );
-//		CI_LOG_V("Wrote buffer");
-	}
-}
-
-void Slave::onConnect( TcpSessionRef _session )
-{
-	CI_LOG_I( "Connected" );
-
-	session = _session;
-
-	if (disableNagle) {
-		asio::ip::tcp::no_delay option(true);
-		session->getSocket()->set_option(option);
-	}
-
-	session->connectCloseEventHandler( [ & ]()
-	{
-		CI_LOG_E( "Disconnected" );
-	} );
-	session->connectErrorEventHandler( &Slave::onError, this );
-	session->connectReadEventHandler( &Slave::onRead, this );
-	session->read();
-
-//	session->connectWriteEventHandler( &Slave::onWrite, this );
-	//	session->connectReadCompleteEventHandler( [ & ]()
-//	{
-//		CI_LOG_I( "Read complete" );
-//	} );
-}
-
-void Slave::onError( string err, size_t bytesTransferred )
-{
-	string text = "Error";
-	if ( !err.empty() ) {
-		text += ": " + err;
-	}
-	CI_LOG_E( text );
-}
-
-
-void Slave::onRead( ci::BufferRef buffer )
-{
-//	CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
-
-	bytesInTcp.processBuffer( buffer );
-
-	for ( KeyValByteBase * kv : bytesInTcp.getPairs() ) {
-
-		switch (kv->getKey()) {
-//			case '':
-//				break;
-		}
-
-	}
-
-}
-
-void Slave::onWrite( size_t bytesTransferred )
-{
-//	CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
-}
-
-
 void Slave::cleanup()
 {
-	if (session && session->getSocket()->is_open()) {
-		session->close();
-	}
+	//
 }
 
 }//namespace coc

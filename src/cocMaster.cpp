@@ -29,29 +29,16 @@ using namespace std;
 
 namespace coc{
     
-void Master::setup( asio::io_service& _ioService, std::string _multicastIp, int _port )
+void Master::setup( std::string _multicastIp, int _port )
 {
     SlaveDriverBase::setup();
 
     port = _port;
 
-    // TCP
-
-    if (useTcp) {
-        serverTcp = TcpServer::create( _ioService );
-
-        serverTcp->connectAcceptEventHandler( &Master::onAccept, this );
-        serverTcp->connectCancelEventHandler( &Master::onCancel, this );
-        serverTcp->connectErrorEventHandler( &Master::onError, this );
-
-        accept();
-
-    }
-
     // UDP
 
     udpEndpoint = asio::ip::udp::endpoint( asio::ip::address::from_string(_multicastIp), (short) port);
-    udpSocket = new asio::ip::udp::socket( _ioService, udpEndpoint.protocol() );
+    udpSocket = new asio::ip::udp::socket( app::App::get()->io_service(), udpEndpoint.protocol() );
 
 }
 
@@ -72,20 +59,6 @@ void Master::update( double _delta, double _appTime )
 
 void Master::send()
 {
-    // TCP
-
-    if (useTcp) {
-        bytesInTcp.clear();
-
-        if (bytesOutTcp.getPairs().size()) { //if pairs have been added before update called
-            writeToAll( bytesOutTcp.getBuffer() );
-            bytesOutTcp.clear();
-        }
-
-        for ( auto session : sessions) {
-            if (session->getSocket()->is_open()) session->read();
-        }
-    }
 
 
     // UDP
@@ -117,127 +90,19 @@ void Master::udpSend()
 
 void Master::drawDebug( ci::ivec2 pos )
 {
-
-    string text = "MASTER:\n";
-    text += "numSessions = " + toString( sessions.size() ) + "\n";
-    int numSessionsConnected = 0;
-    for ( auto session : sessions) if (session) numSessionsConnected++;
-    text += "numSessionsConnected = " + toString( numSessionsConnected ) + "\n\n";
-
-
-    TextBox textbox;
-    textbox.setText(text);
-    gl::TextureRef tex = gl::Texture::create( textbox.render() );
-    gl::ScopedColor col( Color(1,1,1) );
-    gl::draw(tex, pos);
-}
-
-
-void Master::writeToAll( BufferRef _buf ) {
-
-    for ( auto session : sessions) {
-        if (session && session->getSocket()->is_open()) {
-            session->write( _buf );
-//            CI_LOG_V("Wrote buffer");
-        }
-    }
-
-
-}
-
-
-void Master::accept()
-{
-    if ( serverTcp ) {
-
-        serverTcp->accept( (uint16_t)port );
-        CI_LOG_I( "Listening on port " << toString( port ) <<"with max connections " << (int) serverTcp->getAcceptor()->max_connections );
-    }
-}
-
-
-void Master::onAccept( TcpSessionRef _session )
-{
-    CI_LOG_I( "Connected" );
-
-    sessions.push_back(_session);
-    auto session = sessions.back();
-
-    if (disableNagle) {
-        asio::ip::tcp::no_delay option(true);
-        session->getSocket()->set_option(option);
-    }
-
-    session->connectCloseEventHandler( [ & ]() {
-        CI_LOG_I(  "Session closed" );
-    } );
-    session->connectErrorEventHandler( &Master::onError, this );
-//    session->connectReadCompleteEventHandler( &Master::onReadComplete, this );
-    session->connectReadEventHandler( &Master::onRead, this );
-//    session->connectWriteEventHandler( &Master::onWrite, this );
-
-//    session->read();
-
-}
-
-void Master::onCancel()
-{
-    CI_LOG_I( "Canceled" );
-
-    accept();
-}
-
-void Master::onClose()
-{
-    CI_LOG_I( "Disconnected" );
-
-    accept();
-}
-
-void Master::onError( string err, size_t bytesTransferred )
-{
-    string text = "Error";
-    if ( !err.empty() ) {
-        text += ": " + err;
-    }
-    CI_LOG_E( text );
-}
-
-void Master::onRead( BufferRef buffer )
-{
-//    CI_LOG_V( toString( buffer->getSize() ) + " bytes read" );
-
-    bytesInTcp.processBuffer(buffer);
-
-//    for ( KeyValByteBase * kv : bytesInTcp.getPairs() ) {
+//    string text = "MASTER:\n";
 //
-//        switch (kv->getKey()) {
-//            case '':
-//                break;
-//        }
-//
-//    }
-
+//    TextBox textbox;
+//    textbox.setText(text);
+//    gl::TextureRef tex = gl::Texture::create( textbox.render() );
+//    gl::ScopedColor col( Color(1,1,1) );
+//    gl::draw(tex, pos);
 }
 
-void Master::onReadComplete()
-{
-//    CI_LOG_I( "Read complete" );
-}
-
-void Master::onWrite( size_t bytesTransferred )
-{
-        CI_LOG_V( toString( bytesTransferred ) + " bytes written" );
-}
 
 
 void Master::cleanup()
 {
-    for ( auto session : sessions) {
-        if (session && session->getSocket()->is_open()) {
-            session->close();
-        }
-    }
 
 }
 

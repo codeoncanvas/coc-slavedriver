@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "TcpServer.h"
 #include "cinder/gl/gl.h"
 #include "cocSlaveDriverBase.h"
 
@@ -31,7 +30,7 @@ class Master : public SlaveDriverBase {
 public:
 
 	//! Start listening for client connections
-    void setup(  asio::io_service& _ioService, std::string _multicastIp, int _port );
+    void setup( std::string _multicastIp, int _port );
 
 	//! Call to send message
 	void update( double _delta, double _appTime );
@@ -46,11 +45,6 @@ public:
     
 private:
 
-	void writeToAll( ci::BufferRef _buf );
-
-    TcpServerRef				serverTcp;
-	std::vector<TcpSessionRef>	sessions;
-
 	int32_t						lastFrameSent = -1;
 
 	asio::ip::udp::endpoint 	udpEndpoint;
@@ -59,14 +53,6 @@ private:
 	void 						udpHandleSend( const asio::error_code &error );
 	void 						udpSend();
 
-	void						accept();
-    void						onAccept( TcpSessionRef _session );
-    void						onCancel();
-    void						onClose();
-    void						onError( std::string err, size_t bytesTransferred );
-    void						onRead( ci::BufferRef buffer );
-    void						onReadComplete();
-	void						onWrite( size_t bytesTransferred );
     
 };//class Master
 
